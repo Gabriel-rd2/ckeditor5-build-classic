@@ -38,6 +38,7 @@ import Mention from "@ckeditor/ckeditor5-mention/src/mention";
 import BlockToolbar from "@ckeditor/ckeditor5-ui/src/toolbar/block/blocktoolbar";
 import HeadingButtonsUI from "@ckeditor/ckeditor5-heading/src/headingbuttonsui";
 import ParagraphButtonUI from "@ckeditor/ckeditor5-paragraph/src/paragraphbuttonui";
+import CardsConnectionPlugin from "./CardsConnectionPlugin";
 
 class InlineEditor extends InlineEditorBase {}
 class BalloonEditor extends BalloonEditorBase {}
@@ -71,6 +72,7 @@ const plugins = [
 	HorizontalLine,
 	AutoLink,
 	Mention,
+	CardsConnectionPlugin,
 ];
 
 const config = {
