@@ -1,4 +1,5 @@
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import TextWatcher from "@ckeditor/ckeditor5-typing/src/textwatcher";
 
 import CardConnectionCommand from "./cardsconncommand";
 
@@ -19,6 +20,8 @@ export default class CardsConnectionPlugin extends Plugin {
 			"cardconnection",
 			new CardConnectionCommand(this.editor)
 		);
+
+		this._setupTextWatcherForTitle();
 
 		console.log("CardsConnectionPlugin in custom build was initialized");
 	}
@@ -214,5 +217,30 @@ export default class CardsConnectionPlugin extends Plugin {
 
 			conversionApi.writer.setSelection(viewElement, "after");
 		}
+	}
+
+	_setupTextWatcherForTitle() {
+		const editor = this.editor;
+
+		const watcher = new TextWatcher(editor.model, _createRegExpCallback());
+
+		watcher.on("matched", (evt, data) => {
+			console.log("matched");
+		});
+
+		watcher.on("unmatched", () => {
+			console.log("unmatched");
+		});
+
+		const cardsConnectionCommand = editor.commands.get("cardsconnection");
+		watcher.bind("isEnabled").to(cardsConnectionCommand);
+
+		return watcher;
+	}
+
+	_createRegExpCallback() {
+		const regExp = (regExp = /(\[\[)([^*]+)(\]\])/);
+
+		return (text) => regExp.test(text);
 	}
 }
