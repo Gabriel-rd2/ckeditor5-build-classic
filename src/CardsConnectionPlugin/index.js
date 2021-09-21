@@ -251,10 +251,13 @@ export default class CardsConnectionPlugin extends Plugin {
 		const cardConnectionView = new CardConnectionView(locale);
 
 		this._items = new Collection();
+		const configCards = editor.config.get("cardconnections.cardList");
+		for (const card of configCards) this._items.add(card);
 
 		cardConnectionView.items.bindTo(this._items).using((data) => {
 			console.log(data);
-			// const { item, marker } = data;
+			// const { id, title, link } = data;
+
 			// const listItemView = new CardsConnectionItemView(locale);
 			// const view = this._renderItem(item, marker);
 			// view.delegate("execute").to(listItemView);
