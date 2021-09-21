@@ -253,15 +253,13 @@ export default class CardsConnectionPlugin extends Plugin {
 		const cardConnectionView = new CardConnectionView(locale);
 
 		this._items = new Collection();
-		const configCards = editor.config.get("cardconnections.cardList");
-		for (const card of configCards) this._items.add(card);
 
-		cardConnectionView.items.bindTo(this._items).using((data) => {
-			console.log(data);
+		cardConnectionView.items.bindTo(this._items).using((card) => {
+			console.log(card);
 			// const { id, title, link } = data;
 
 			// const listItemView = new CardsConnectionItemView(locale);
-			// const view = this._renderItem(item, marker);
+			// const view = this._renderItem(card);
 			// view.delegate("execute").to(listItemView);
 			// listItemView.children.add(view);
 			// listItemView.item = item;
@@ -274,6 +272,9 @@ export default class CardsConnectionPlugin extends Plugin {
 			// });
 			// return listItemView;
 		});
+
+		const configCards = editor.config.get("cardconnections.cardList");
+		for (const card of configCards) this._items.add(card);
 
 		// mentionsView.on("execute", (evt, data) => {
 		// 	const editor = this.editor;
@@ -303,6 +304,36 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		console.log("Created CardConnectionView.");
 		return cardConnectionView;
+	}
+
+	_renderItem({ id, title, link }) {
+		const editor = this.editor;
+
+		let view;
+		let label = item.id;
+
+		const renderer = this._getItemRenderer(marker);
+
+		if (renderer) {
+			const renderResult = renderer(item);
+
+			if (typeof renderResult != "string") {
+				view = new DomWrapperView(editor.locale, renderResult);
+			} else {
+				label = renderResult;
+			}
+		}
+
+		if (!view) {
+			const buttonView = new ButtonView(editor.locale);
+
+			buttonView.label = label;
+			buttonView.withText = true;
+
+			view = buttonView;
+		}
+
+		return view;
 	}
 
 	_showUI() {
