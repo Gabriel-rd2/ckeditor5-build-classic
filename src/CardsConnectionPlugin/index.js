@@ -2,6 +2,7 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import TextWatcher from "@ckeditor/ckeditor5-typing/src/textwatcher";
 import Collection from "@ckeditor/ckeditor5-utils/src/collection";
 import ContextualBalloon from "@ckeditor/ckeditor5-ui/src/panel/balloon/contextualballoon";
+import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 
 import CardConnectionCommand from "./cardsconncommand";
 import CardConnectionView, {
@@ -280,10 +281,17 @@ export default class CardsConnectionPlugin extends Plugin {
 	_renderItem(item) {
 		const editor = this.editor;
 
-		const renderResult = document.createElement("span");
-		renderResult.innerHTML = item.title;
+		const buttonView = new ButtonView(editor.locale);
 
-		let view = new DomWrapperView(editor.locale, renderResult);
+		buttonView.label = item.title;
+		buttonView.withText = true;
+
+		view = buttonView;
+
+		// const renderResult = document.createElement("span");
+		// renderResult.innerHTML = item.title;
+
+		// let view = new DomWrapperView(editor.locale, renderResult);
 
 		return view;
 	}
