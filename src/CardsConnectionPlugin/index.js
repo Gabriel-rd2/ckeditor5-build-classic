@@ -275,6 +275,7 @@ export default class CardsConnectionPlugin extends Plugin {
 			this._items.add({ id: card.id.toString(), title: card.title });
 
 		console.log("Created CardConnectionView.");
+
 		return cardConnectionView;
 	}
 
@@ -288,17 +289,13 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		let view = buttonView;
 
-		// const renderResult = document.createElement("span");
-		// renderResult.innerHTML = item.title;
-
-		// let view = new DomWrapperView(editor.locale, renderResult);
-
 		return view;
 	}
 
 	_showUI() {
+		const cardConnectionView = this._cardConnectionView;
 		this._balloon.add({
-			view: this._cardConnectionView,
+			view: cardConnectionView,
 			position: this._getBalloonPanelPositionData(
 				this._mentionsView.position
 			),
