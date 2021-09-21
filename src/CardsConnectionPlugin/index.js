@@ -4,7 +4,10 @@ import Collection from "@ckeditor/ckeditor5-utils/src/collection";
 import ContextualBalloon from "@ckeditor/ckeditor5-ui/src/panel/balloon/contextualballoon";
 
 import CardConnectionCommand from "./cardsconncommand";
-import CardConnectionView, { CardsConnectionItemView } from "./ui/view";
+import CardConnectionView, {
+	CardsConnectionItemView,
+	DomWrapperView,
+} from "./ui/view";
 
 const VERTICAL_SPACING = 3;
 
@@ -35,7 +38,7 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		this._balloon = editor.plugins.get(ContextualBalloon);
 		this._cardConnectionView = this._createCardConnectionView();
-		// this._showUI();
+		this._showUI();
 
 		console.log("CardsConnectionPlugin in custom build was initialized");
 	}
@@ -256,82 +259,30 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		cardConnectionView.items.bindTo(this._items).using((card) => {
 			console.log(card);
-			// const { id, title, link } = data;
 
-			// const listItemView = new CardsConnectionItemView(locale);
-			// const view = this._renderItem(card);
-			// view.delegate("execute").to(listItemView);
-			// listItemView.children.add(view);
-			// listItemView.item = item;
-			// listItemView.marker = marker;
-			// listItemView.on("execute", () => {
-			// 	mentionsView.fire("execute", {
-			// 		item,
-			// 		marker,
-			// 	});
-			// });
-			// return listItemView;
+			const listItemView = new CardsConnectionItemView(locale);
+			const view = this._renderItem(card);
+
+			listItemView.children.add(view);
+			listItemView.item = card;
+
+			return listItemView;
 		});
 
 		const configCards = editor.config.get("cardconnections.cardList");
 		for (const card of configCards) this._items.add(card);
 
-		// mentionsView.on("execute", (evt, data) => {
-		// 	const editor = this.editor;
-		// 	const model = editor.model;
-
-		// 	const item = data.item;
-		// 	const marker = data.marker;
-
-		// 	const mentionMarker = editor.model.markers.get("mention");
-
-		// 	// Create a range on matched text.
-		// 	const end = model.createPositionAt(model.document.selection.focus);
-		// 	const start = model.createPositionAt(mentionMarker.getStart());
-		// 	const range = model.createRange(start, end);
-
-		// 	this._hideUIAndRemoveMarker();
-
-		// 	editor.execute("mention", {
-		// 		mention: item,
-		// 		text: item.text,
-		// 		marker,
-		// 		range,
-		// 	});
-
-		// 	editor.editing.view.focus();
-		// });
-
 		console.log("Created CardConnectionView.");
 		return cardConnectionView;
 	}
 
-	_renderItem({ id, title, link }) {
+	_renderItem(item) {
 		const editor = this.editor;
 
-		let view;
-		let label = item.id;
+		const renderResult = document.createElement("<span>");
+		renderResult.innerHTML = item.title;
 
-		const renderer = this._getItemRenderer(marker);
-
-		if (renderer) {
-			const renderResult = renderer(item);
-
-			if (typeof renderResult != "string") {
-				view = new DomWrapperView(editor.locale, renderResult);
-			} else {
-				label = renderResult;
-			}
-		}
-
-		if (!view) {
-			const buttonView = new ButtonView(editor.locale);
-
-			buttonView.label = label;
-			buttonView.withText = true;
-
-			view = buttonView;
-		}
+		let view = new DomWrapperView(editor.locale, renderResult);
 
 		return view;
 	}
@@ -347,7 +298,6 @@ export default class CardsConnectionPlugin extends Plugin {
 		});
 
 		this._mentionsView.position = this._balloon.view.position;
-		// this._mentionsView.selectFirst();
 	}
 
 	_getBalloonPanelPositionData(preferredPosition) {
