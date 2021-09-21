@@ -235,9 +235,6 @@ export default class CardsConnectionPlugin extends Plugin {
 			console.log("unmatched");
 		});
 
-		const cardsConnectionCommand = editor.commands.get("cardconnection");
-		watcher.bind("isEnabled").to(cardsConnectionCommand);
-
 		return watcher;
 	}
 
