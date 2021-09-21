@@ -18,20 +18,22 @@ export default class CardsConnectionPlugin extends Plugin {
 	}
 
 	init() {
+		const editor = this.editor;
+
 		// Define novos componentes para o modelo interno do CkEditor
 		this._defineSchema();
 		// Define políticas para as conversões entre as views de dados, edição e o modelo
 		this._defineConverters();
 
 		// Adiciona o commando que substitui o padrão [[*]] por um link para um card de título "*"
-		this.editor.commands.add(
+		editor.commands.add(
 			"cardconnection",
-			new CardConnectionCommand(this.editor)
+			new CardConnectionCommand(editor)
 		);
 		// Adiciona um TextWatcher para encontrar o padrão [[*]] no texto e disparar o comando adicionado acima
 		this._setupTextWatcherForTitle();
 
-		this._balloon = this.editor.plugins.get(ContextualBalloon);
+		this._balloon = editor.plugins.get(ContextualBalloon);
 		this._cardConnectionView = this._createCardConnectionView();
 		// this._showUI();
 
@@ -245,7 +247,7 @@ export default class CardsConnectionPlugin extends Plugin {
 
 	_createCardConnectionView() {
 		console.log("Creating CardConnectionView...");
-
+		const editor = this.editor;
 		const locale = this.editor.locale;
 
 		const cardConnectionView = new CardConnectionView(locale);
@@ -299,6 +301,7 @@ export default class CardsConnectionPlugin extends Plugin {
 		// 	editor.editing.view.focus();
 		// });
 
+		console.log("Created CardConnectionView.");
 		return cardConnectionView;
 	}
 
