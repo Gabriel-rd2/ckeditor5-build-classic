@@ -293,17 +293,16 @@ export default class CardsConnectionPlugin extends Plugin {
 	}
 
 	_showUI() {
-		const cardConnectionView = this._cardConnectionView;
 		this._balloon.add({
-			view: cardConnectionView,
+			view: this._cardConnectionView,
 			position: this._getBalloonPanelPositionData(
-				this._mentionsView.position
+				this._cardConnectionView.position
 			),
 			withArrow: false,
 			singleViewMode: true,
 		});
 
-		this._mentionsView.position = this._balloon.view.position;
+		this._cardConnectionView.position = this._balloon.view.position;
 	}
 
 	_getBalloonPanelPositionData(preferredPosition) {
