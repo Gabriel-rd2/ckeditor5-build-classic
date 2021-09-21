@@ -1,42 +1,87 @@
 import ContextualBalloon from "@ckeditor/ckeditor5-ui/src/panel/balloon/contextualballoon";
-import View from "@ckeditor/ckeditor5-ui/src/view";
+import ListView from "@ckeditor/ckeditor5-ui/src/list/listview";
+import ListItemView from "@ckeditor/ckeditor5-ui/src/list/listitemview";
+import Rect from "@ckeditor/ckeditor5-utils/src/dom/rect";
 
-export default class CardsConnectionView extends View {
-  constructor(locale) {
-    super(locale);
+// import '../../theme/mentionui.css';
 
-    // An entry point to binding observables with DOM attributes,
-    // events and text nodes.
-    const bind = this.bindTemplate;
+export default class CardsConnectionView extends ListView {
+	constructor(locale) {
+		super(locale);
 
-    // Views define their interface (state) using observable properties.
-    this.set({
-      isEnabled: false,
-      placeholder: "",
-    });
+		// this.extendTemplate({
+		// 	attributes: {
+		// 		class: ["ck-mentions"],
 
-    this.setTemplate({
-      tag: "input",
-      attributes: {
-        class: [
-          "foo",
-          // The value of view#isEnabled will control the presence
-          // of the class.
-          bind.if("isEnabled", "ck-enabled"),
-        ],
+		// 		tabindex: "-1",
+		// 	},
+		// });
+	}
 
-        // The HTML "placeholder" attribute is also controlled by the observable.
-        placeholder: bind.to("placeholder"),
-        type: "text",
-      },
-      on: {
-        // DOM keydown events will fire the view#input event.
-        keydown: bind.to("input"),
-      },
-    });
-  }
+	// selectFirst() {
+	// 	this.select(0);
+	// }
 
-  setValue(newValue) {
-    this.element.value = newValue;
-  }
+	// selectNext() {
+	// 	const item = this.selected;
+	// 	const index = this.items.getIndex(item);
+
+	// 	this.select(index + 1);
+	// }
+
+	// selectPrevious() {
+	// 	const item = this.selected;
+	// 	const index = this.items.getIndex(item);
+
+	// 	this.select(index - 1);
+	// }
+
+	// select(index) {
+	// 	let indexToGet = 0;
+
+	// 	if (index > 0 && index < this.items.length) {
+	// 		indexToGet = index;
+	// 	} else if (index < 0) {
+	// 		indexToGet = this.items.length - 1;
+	// 	}
+
+	// 	const item = this.items.get(indexToGet);
+
+	// 	// Return early if item is already selected.
+	// 	if (this.selected === item) {
+	// 		return;
+	// 	}
+
+	// 	// Remove highlight of previously selected item.
+	// 	if (this.selected) {
+	// 		this.selected.removeHighlight();
+	// 	}
+
+	// 	item.highlight();
+	// 	this.selected = item;
+
+	// 	// Scroll the mentions view to the selected element.
+	// 	if (!this._isItemVisibleInScrolledArea(item)) {
+	// 		this.element.scrollTop = item.element.offsetTop;
+	// 	}
+	// }
+
+	// executeSelected() {
+	// 	this.selected.fire("execute");
+	// }
+
+	// _isItemVisibleInScrolledArea(item) {
+	// 	return new Rect(this.element).contains(new Rect(item.element));
+	// }
+}
+
+export class CardsConnectionItemView extends ListItemView {
+	// highlight() {
+	// 	const child = this.children.first;
+	// 	child.isOn = true;
+	// }
+	// removeHighlight() {
+	// 	const child = this.children.first;
+	// 	child.isOn = false;
+	// }
 }
