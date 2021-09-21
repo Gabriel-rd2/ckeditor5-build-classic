@@ -334,7 +334,7 @@ export default class CardsConnectionPlugin extends Plugin {
 
 				return null;
 			},
-			positions: getBalloonPanelPositions(preferredPosition),
+			positions: this.getBalloonPanelPositions(preferredPosition),
 		};
 	}
 
