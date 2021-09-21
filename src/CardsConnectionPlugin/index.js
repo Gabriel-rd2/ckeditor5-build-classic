@@ -239,8 +239,8 @@ export default class CardsConnectionPlugin extends Plugin {
 	}
 
 	_createRegExpCallback() {
-		// const regExp = /(\[\[)([^*]+)(\]\])/;
-		const regExp = /^hello/;
+		const regExp = /(\[\[)([^*]+)(\]\])/;
+		// const regExp = /^hello/;
 
 		return (text) => regExp.test(text);
 	}
