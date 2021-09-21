@@ -229,6 +229,8 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		watcher.on("matched", (evt, data) => {
 			console.log("matched");
+			// console.log(data);
+			editor.execute("cardconnection", { editor });
 		});
 
 		watcher.on("unmatched", () => {
@@ -240,8 +242,6 @@ export default class CardsConnectionPlugin extends Plugin {
 
 	_createRegExpCallback() {
 		const regExp = /(\[\[)([^*]+)(\]\])/;
-		// const regExp = /^hello/;
-
 		return (text) => regExp.test(text);
 	}
 }
