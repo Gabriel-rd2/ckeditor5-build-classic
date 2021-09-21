@@ -85,7 +85,8 @@
     "build": "webpack --mode production",
     "lint": "eslint --quiet '**/*.js'",
     "stylelint": "stylelint --quiet --allow-empty-input 'theme/**/*.css' 'docs/**/*.css'",
-    "preversion": "npm run build"
+    "preversion": "npm run build",
+    "build-and-push": "./build-and-push.sh"
   },
   "lint-staged": {
     "**/*.js": [
