@@ -31,7 +31,7 @@ export default class CardsConnectionPlugin extends Plugin {
 		// Adiciona um TextWatcher para encontrar o padrão [[*]] no texto e disparar o comando adicionado acima
 		this._setupTextWatcherForTitle();
 
-		this._balloon = editor.plugins.get(ContextualBalloon);
+		this._balloon = this.editor.plugins.get(ContextualBalloon);
 		this._cardConnectionView = this._createCardConnectionView();
 		// this._showUI();
 
