@@ -280,7 +280,7 @@ export default class CardsConnectionPlugin extends Plugin {
 	_renderItem(item) {
 		const editor = this.editor;
 
-		const renderResult = document.createElement("<span>");
+		const renderResult = document.createElement("span");
 		renderResult.innerHTML = item.title;
 
 		let view = new DomWrapperView(editor.locale, renderResult);
