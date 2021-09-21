@@ -3,6 +3,7 @@ import TextWatcher from "@ckeditor/ckeditor5-typing/src/textwatcher";
 import Collection from "@ckeditor/ckeditor5-utils/src/collection";
 import ContextualBalloon from "@ckeditor/ckeditor5-ui/src/panel/balloon/contextualballoon";
 import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
+import Rect from "@ckeditor/ckeditor5-utils/src/dom/rect";
 
 import CardConnectionCommand from "./cardsconncommand";
 import CardConnectionView, {
