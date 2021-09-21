@@ -286,7 +286,7 @@ export default class CardsConnectionPlugin extends Plugin {
 		buttonView.label = item.title;
 		buttonView.withText = true;
 
-		view = buttonView;
+		let view = buttonView;
 
 		// const renderResult = document.createElement("span");
 		// renderResult.innerHTML = item.title;
