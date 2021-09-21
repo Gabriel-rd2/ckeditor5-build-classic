@@ -270,7 +270,8 @@ export default class CardsConnectionPlugin extends Plugin {
 		});
 
 		const configCards = editor.config.get("cardconnections.cardList");
-		for (const card of configCards) this._items.add(card);
+		for (const card of configCards)
+			this._items.add({ id: string(card.id), title: card.title });
 
 		console.log("Created CardConnectionView.");
 		return cardConnectionView;
