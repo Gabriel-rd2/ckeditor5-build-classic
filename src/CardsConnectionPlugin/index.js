@@ -329,6 +329,7 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		return {
 			target: () => {
+				console.log("Running target fucntion...");
 				let modelRange = rangeBefore;
 
 				console.log("modelRange", modelRange);
@@ -338,6 +339,7 @@ export default class CardsConnectionPlugin extends Plugin {
 					domConverter.viewRangeToDom(viewRange)
 				);
 
+				console.log("Ran target fucntion...");
 				return rangeRects.pop();
 			},
 			limiter: () => {
