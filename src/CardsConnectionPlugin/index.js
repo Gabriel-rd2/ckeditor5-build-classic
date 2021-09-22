@@ -390,6 +390,8 @@ export default class CardsConnectionPlugin extends Plugin {
 			return [positions[preferredPosition]];
 		}
 
+		console.log("Got baloon panel positions.");
+
 		// By default return all position callbacks.
 		return [
 			positions.caret_se,
