@@ -41,7 +41,8 @@ export default class CardsConnectionPlugin extends Plugin {
 		this._balloon = editor.plugins.get(ContextualBalloon);
 		this._cardConnectionView = this._createCardConnectionView();
 
-		this._setupTextWatcherForShowingUI();
+		this._showUI();
+		// this._setupTextWatcherForShowingUI();
 
 		console.log("CardsConnectionPlugin in custom build was initialized");
 	}
@@ -283,12 +284,14 @@ export default class CardsConnectionPlugin extends Plugin {
 
 	_setupTextWatcherForShowingUI() {
 		const editor = this.editor;
+		const partialMatchRegExp = /(\[\[)([^*]+)/;
 
 		const watcher = new TextWatcher(editor.model, (text) =>
-			/(\[\[)([^*]+)/.test(text)
+			partialMatchRegExp.test(text)
 		);
 
-		watcher.on("matched", () => this._showUI());
+		// watcher.on("matched", () => this._showUI());
+		watcher.on("matched", () => console.log("matched partially"));
 	}
 
 	_renderItem(item) {
@@ -298,6 +301,9 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		buttonView.label = item.title;
 		buttonView.withText = true;
+		buttonView.isEnabled = true;
+		buttonView.execute({ name: "listItem:click" });
+		buttonView.on("listItem:click", () => console.log(item.title));
 
 		let view = buttonView;
 
