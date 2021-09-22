@@ -316,11 +316,20 @@ export default class CardsConnectionPlugin extends Plugin {
 		const editing = editor.editing;
 		const domConverter = editing.view.domConverter;
 		const mapper = editing.mapper;
+		const selection = editor.model.document.selection;
+		const cursorPosition = selection.getFirstPosition();
+
+		let rangeBefore;
+		editor.model.change((writer) => {
+			rangeBefore = writer.createRange(
+				writer.createPositionAt(cursorPosition.parent, 0),
+				cursorPosition
+			);
+		});
 
 		return {
 			target: () => {
-				let modelRange =
-					editor.model.document.selection.getFirstRange();
+				let modelRange = rangeBefore;
 
 				console.log("modelRange", modelRange);
 
