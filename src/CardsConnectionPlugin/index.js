@@ -281,7 +281,7 @@ export default class CardsConnectionPlugin extends Plugin {
 		return cardConnectionView;
 	}
 
-	_setupTextWatcherForReplacingTitle() {
+	_setupTextWatcherForShowingUI() {
 		const editor = this.editor;
 
 		const watcher = new TextWatcher(editor.model, (text) =>
