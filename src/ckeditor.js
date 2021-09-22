@@ -7,6 +7,8 @@
 import InlineEditorBase from "@ckeditor/ckeditor5-editor-inline/src/inlineeditor";
 import BalloonEditorBase from "@ckeditor/ckeditor5-editor-balloon/src/ballooneditor";
 
+import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
+
 import Essentials from "@ckeditor/ckeditor5-essentials/src/essentials";
 import UploadAdapter from "@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter";
 import Autoformat from "@ckeditor/ckeditor5-autoformat/src/autoformat";
@@ -295,5 +297,8 @@ BalloonEditor.defaultConfig = {
 		],
 	},
 };
+
+CKEditorInspector.attach("inline-editor", InlineEditor);
+CKEditorInspector.attach("baloon-editor", BalloonEditor);
 
 export default { InlineEditor, BalloonEditor };
