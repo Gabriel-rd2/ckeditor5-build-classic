@@ -36,11 +36,12 @@ export default class CardsConnectionPlugin extends Plugin {
 			new CardConnectionCommand(editor)
 		);
 		// Adiciona um TextWatcher para encontrar o padrão [[*]] no texto e disparar o comando adicionado acima
-		this._setupTextWatcherForTitle();
+		this._setupTextWatcherForReplacingTitle();
 
 		this._balloon = editor.plugins.get(ContextualBalloon);
 		this._cardConnectionView = this._createCardConnectionView();
-		this._showUI();
+
+		this._setupTextWatcherForShowingUI();
 
 		console.log("CardsConnectionPlugin in custom build was initialized");
 	}
@@ -238,7 +239,7 @@ export default class CardsConnectionPlugin extends Plugin {
 		}
 	}
 
-	_setupTextWatcherForTitle() {
+	_setupTextWatcherForReplacingTitle() {
 		const editor = this.editor;
 
 		const watcher = new TextWatcher(editor.model, (text) =>
@@ -278,6 +279,16 @@ export default class CardsConnectionPlugin extends Plugin {
 		console.log("Created CardConnectionView.");
 
 		return cardConnectionView;
+	}
+
+	_setupTextWatcherForReplacingTitle() {
+		const editor = this.editor;
+
+		const watcher = new TextWatcher(editor.model, (text) =>
+			/(\[\[)([^*]+)/.test(text)
+		);
+
+		watcher.on("matched", () => this._showUI());
 	}
 
 	_renderItem(item) {
