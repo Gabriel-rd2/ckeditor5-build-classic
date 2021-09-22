@@ -322,6 +322,8 @@ export default class CardsConnectionPlugin extends Plugin {
 				let modelRange =
 					editor.model.document.selection.getFirstRange();
 
+				console.log("modelRange", modelRange);
+
 				const viewRange = mapper.toViewRange(modelRange);
 				const rangeRects = Rect.getDomRangeRects(
 					domConverter.viewRangeToDom(viewRange)
