@@ -328,7 +328,7 @@ export default class CardsConnectionPlugin extends Plugin {
 		});
 
 		return {
-			target: rangeBefore,
+			target: mapper.toViewRange(modelRange),
 			limiter: () => {
 				const view = this.editor.editing.view;
 				const viewDocument = view.document;
