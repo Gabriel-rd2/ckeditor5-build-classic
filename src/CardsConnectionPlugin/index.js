@@ -299,11 +299,15 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		const buttonView = new ButtonView(editor.locale);
 
+		// buttonView.id = item.id.toString();
 		buttonView.label = item.title;
 		buttonView.withText = true;
 		buttonView.isEnabled = true;
-		buttonView.execute({ name: "listItem:click" });
-		buttonView.on("listItem:click", () => console.log(item.title));
+
+		buttonView.on("execute", (eventInfo) => {
+			const { label } = eventInfo.source;
+			console.log(label);
+		});
 
 		let view = buttonView;
 
