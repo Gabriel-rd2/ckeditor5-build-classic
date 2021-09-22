@@ -335,6 +335,7 @@ export default class CardsConnectionPlugin extends Plugin {
 				const editableElement = viewDocument.selection.editableElement;
 
 				if (editableElement) {
+					console.log("has editableElement limiter!");
 					return view.domConverter.mapViewToDom(editableElement.root);
 				}
 
