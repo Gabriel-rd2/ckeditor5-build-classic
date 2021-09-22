@@ -328,23 +328,7 @@ export default class CardsConnectionPlugin extends Plugin {
 		});
 
 		return {
-			target: () => {
-				console.log("Running target fucntion...");
-				let modelRange = rangeBefore;
-
-				console.log("modelRange", modelRange);
-
-				const viewRange = mapper.toViewRange(modelRange);
-
-				console.log("viewRange", viewRange);
-
-				const rangeRects = Rect.getDomRangeRects(
-					domConverter.viewRangeToDom(viewRange)
-				);
-
-				console.log("Ran target fucntion...");
-				return rangeRects.pop();
-			},
+			target: rangeBefore,
 			limiter: () => {
 				const view = this.editor.editing.view;
 				const viewDocument = view.document;
