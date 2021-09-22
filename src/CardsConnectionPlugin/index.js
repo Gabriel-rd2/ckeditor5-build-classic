@@ -294,6 +294,8 @@ export default class CardsConnectionPlugin extends Plugin {
 	}
 
 	_showUI() {
+		console.log("Showing UI...");
+
 		this._balloon.add({
 			view: this._cardConnectionView,
 			position: this._getBalloonPanelPositionData(
@@ -304,9 +306,12 @@ export default class CardsConnectionPlugin extends Plugin {
 		});
 
 		this._cardConnectionView.position = this._balloon.view.position;
+
+		console.log("Showed UI.");
 	}
 
 	_getBalloonPanelPositionData(preferredPosition) {
+		console.log("Getting baloon panel position data...");
 		const editor = this.editor;
 		const editing = editor.editing;
 		const domConverter = editing.view.domConverter;
@@ -340,6 +345,8 @@ export default class CardsConnectionPlugin extends Plugin {
 	}
 
 	getBalloonPanelPositions(preferredPosition) {
+		console.log("Getting baloon panel positions...");
+
 		const positions = {
 			// Positions the panel to the southeast of the caret rectangle.
 			caret_se: (targetRect) => {
