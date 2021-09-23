@@ -297,7 +297,6 @@ export default class CardsConnectionPlugin extends Plugin {
 	_renderItem(item) {
 		const editor = this.editor;
 		const selection = editor.model.document.selection;
-		const cursorPosition = selection.getFirstPosition();
 
 		const buttonView = new ButtonView(editor.locale);
 		buttonView.label = item.title;
@@ -308,6 +307,7 @@ export default class CardsConnectionPlugin extends Plugin {
 			const { label } = eventInfo.source;
 			editor.model.change((writer) => {
 				writer.insertText(`[[${label}]]`, selection.focus);
+				editor.execute("cardconnection", { editor });
 				this._hideUI();
 			});
 			console.log(label);
