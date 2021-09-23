@@ -539,18 +539,21 @@ export default class CardsConnectionPlugin extends Plugin {
 	// }
 
 	_getFilteredCards(cardTitle) {
+		console.log("_getFilteredCards()...");
 		this._lastTitleSearched = cardTitle;
 		const filterCards = getFilterCardsCallback(
 			this.editor.config.get("cardconnections.cardList")
 		);
 
 		const filteredCards = filterCards(cardTitle);
+		console.log("filteredCards: ", filteredCards);
 
 		this.fire("getFilteredCards:response", {
 			filteredCards,
 			cardTitle,
 		});
 
+		console.log("_getFilteredCards() ended.");
 		return;
 	}
 
