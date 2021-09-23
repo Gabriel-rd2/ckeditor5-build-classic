@@ -44,10 +44,15 @@ export default class CardsConnectionPlugin extends Plugin {
 		this._balloon = editor.plugins.get(ContextualBalloon);
 		this._cardConnectionView = this._createCardConnectionView();
 
-		// this._showUI();
-		// this._setupTextWatcherForShowingUI();
+		this.on("getFilteredCards:response", (evt, data) =>
+			this._handleGetFilteredCardsResponse(data)
+		);
 
 		console.log("CardsConnectionPlugin in custom build was initialized");
+	}
+
+	get _isUIVisible() {
+		return this._balloon.visibleView === this._cardConnectionView;
 	}
 
 	_defineSchema() {
@@ -292,17 +297,15 @@ export default class CardsConnectionPlugin extends Plugin {
 				});
 			}
 
-			// this._requestFeedDebounced(marker, cardTitle);
+			this._getFilteredCards(cardTitle);
 		});
 
 		watcher.on("unmatched", () => {
 			this._hideUIAndRemoveMarker();
 		});
 
-		// const mentionCommand = editor.commands.get("mention");
-		// watcher.bind("isEnabled").to(mentionCommand);
-
-		// return watcher;
+		// const cardConnectionCommand = editor.commands.get("cardconnection");
+		// watcher.bind("isEnabled").to(cardConnectionCommand);
 	}
 
 	_createCardConnectionView() {
@@ -326,25 +329,9 @@ export default class CardsConnectionPlugin extends Plugin {
 			return listItemView;
 		});
 
-		const configCards = editor.config.get("cardconnections.cardList");
-		for (const card of configCards)
-			this._items.add({ id: card.id.toString(), title: card.title });
-
 		console.log("Created CardConnectionView.");
 
 		return cardConnectionView;
-	}
-
-	_setupTextWatcherForShowingUI() {
-		const editor = this.editor;
-		const partialMatchRegExp = /(\[\[)([^*]+)/;
-
-		const watcher = new TextWatcher(editor.model, (text) =>
-			partialMatchRegExp.test(text)
-		);
-
-		// watcher.on("matched", () => this._showUI());
-		watcher.on("matched", () => console.log("matched partially"));
 	}
 
 	_renderItem(item) {
@@ -370,135 +357,213 @@ export default class CardsConnectionPlugin extends Plugin {
 		return buttonView;
 	}
 
-	_showUI() {
+	_showOrUpdateUI(marker) {
 		console.log("Showing UI...");
 
-		this._balloon.add({
-			view: this._cardConnectionView,
-			position: this._getBalloonPanelPositionData(
-				this._cardConnectionView.position
-			),
-			withArrow: false,
-			singleViewMode: true,
-		});
+		if (this._isUIVisible) {
+			// Update balloon position as the mention list view may change its size.
+			this._balloon.updatePosition(
+				this._getBalloonPanelPositionData(
+					marker,
+					this._cardConnectionView.position
+				)
+			);
+		} else {
+			this._balloon.add({
+				view: this._cardConnectionView,
+				position: this._getBalloonPanelPositionData(
+					marker,
+					this._cardConnectionView.position
+				),
+				withArrow: false,
+				singleViewMode: true,
+			});
 
-		this._cardConnectionView.position = this._balloon.view.position;
-
-		console.log("Showed UI.");
+			this._cardConnectionView.position = this._balloon.view.position;
+			// this._mentionsView.selectFirst();
+			console.log("Showed UI.");
+		}
 	}
 
-	_hideUI() {
+	_hideUIAndRemoveMarker() {
 		if (this._balloon.hasView(this._cardConnectionView)) {
 			this._balloon.remove(this._cardConnectionView);
 		}
 
-		this._cardConnectionView.position = undefined;
-	}
-
-	_hideUIAndRemoveMarker() {
-		// if (this._balloon.hasView(this._cardConnectionView)) {
-		// 	this._balloon.remove(this._cardConnectionView);
-		// }
-
-		if (isStillInCompleting(this.editor)) {
+		if (isStillCompleting(this.editor)) {
 			this.editor.model.change((writer) =>
 				writer.removeMarker("mention")
 			);
 		}
 
-		// this._cardConnectionView.position = undefined;
+		this._cardConnectionView.position = undefined;
 	}
 
-	_getBalloonPanelPositionData(preferredPosition) {
+	// _getBalloonPanelPositionData(preferredPosition) {
+	// 	console.log("Getting baloon panel position data...");
+	// 	const editor = this.editor;
+	// 	const editing = editor.editing;
+	// 	const domConverter = editing.view.domConverter;
+	// 	const mapper = editing.mapper;
+	// 	const selection = editor.model.document.selection;
+	// 	const cursorPosition = selection.getFirstPosition();
+
+	// 	let rangeBefore;
+	// 	editor.model.change((writer) => {
+	// 		rangeBefore = writer.createRange(
+	// 			writer.createPositionAt(cursorPosition.parent, 0),
+	// 			cursorPosition
+	// 		);
+	// 	});
+
+	// 	return {
+	// 		target: mapper.toViewRange(rangeBefore),
+	// 		limiter: () => {
+	// 			const view = this.editor.editing.view;
+	// 			const viewDocument = view.document;
+	// 			const editableElement = viewDocument.selection.editableElement;
+
+	// 			if (editableElement) {
+	// 				console.log("has editableElement limiter!");
+	// 				return view.domConverter.mapViewToDom(editableElement.root);
+	// 			}
+
+	// 			return null;
+	// 		},
+	// 		positions: this.getBalloonPanelPositions(preferredPosition),
+	// 	};
+	// }
+	_getBalloonPanelPositionData(marker, preferredPosition) {
 		console.log("Getting baloon panel position data...");
+
 		const editor = this.editor;
 		const editing = editor.editing;
 		const domConverter = editing.view.domConverter;
 		const mapper = editing.mapper;
-		const selection = editor.model.document.selection;
-		const cursorPosition = selection.getFirstPosition();
-
-		let rangeBefore;
-		editor.model.change((writer) => {
-			rangeBefore = writer.createRange(
-				writer.createPositionAt(cursorPosition.parent, 0),
-				cursorPosition
-			);
-		});
 
 		return {
-			target: mapper.toViewRange(rangeBefore),
+			target: () => {
+				let modelRange = marker.getRange();
+
+				if (modelRange.start.root.rootName == "$graveyard") {
+					modelRange =
+						editor.model.document.selection.getFirstRange();
+				}
+
+				const viewRange = mapper.toViewRange(modelRange);
+				const rangeRects = Rect.getDomRangeRects(
+					domConverter.viewRangeToDom(viewRange)
+				);
+
+				return rangeRects.pop();
+			},
 			limiter: () => {
 				const view = this.editor.editing.view;
 				const viewDocument = view.document;
 				const editableElement = viewDocument.selection.editableElement;
 
 				if (editableElement) {
-					console.log("has editableElement limiter!");
 					return view.domConverter.mapViewToDom(editableElement.root);
 				}
 
 				return null;
 			},
-			positions: this.getBalloonPanelPositions(preferredPosition),
+			positions: getBalloonPanelPositions(preferredPosition),
 		};
 	}
 
-	getBalloonPanelPositions(preferredPosition) {
-		console.log("Getting baloon panel positions...");
+	// getBalloonPanelPositions(preferredPosition) {
+	// 	console.log("Getting baloon panel positions...");
 
-		const positions = {
-			// Positions the panel to the southeast of the caret rectangle.
-			caret_se: (targetRect) => {
-				return {
-					top: targetRect.bottom + VERTICAL_SPACING,
-					left: targetRect.right,
-					name: "caret_se",
-				};
-			},
+	// 	const positions = {
+	// 		// Positions the panel to the southeast of the caret rectangle.
+	// 		caret_se: (targetRect) => {
+	// 			return {
+	// 				top: targetRect.bottom + VERTICAL_SPACING,
+	// 				left: targetRect.right,
+	// 				name: "caret_se",
+	// 			};
+	// 		},
 
-			// Positions the panel to the northeast of the caret rectangle.
-			caret_ne: (targetRect, balloonRect) => {
-				return {
-					top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
-					left: targetRect.right,
-					name: "caret_ne",
-				};
-			},
+	// 		// Positions the panel to the northeast of the caret rectangle.
+	// 		caret_ne: (targetRect, balloonRect) => {
+	// 			return {
+	// 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
+	// 				left: targetRect.right,
+	// 				name: "caret_ne",
+	// 			};
+	// 		},
 
-			// Positions the panel to the southwest of the caret rectangle.
-			caret_sw: (targetRect, balloonRect) => {
-				return {
-					top: targetRect.bottom + VERTICAL_SPACING,
-					left: targetRect.right - balloonRect.width,
-					name: "caret_sw",
-				};
-			},
+	// 		// Positions the panel to the southwest of the caret rectangle.
+	// 		caret_sw: (targetRect, balloonRect) => {
+	// 			return {
+	// 				top: targetRect.bottom + VERTICAL_SPACING,
+	// 				left: targetRect.right - balloonRect.width,
+	// 				name: "caret_sw",
+	// 			};
+	// 		},
 
-			// Positions the panel to the northwest of the caret rect.
-			caret_nw: (targetRect, balloonRect) => {
-				return {
-					top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
-					left: targetRect.right - balloonRect.width,
-					name: "caret_nw",
-				};
-			},
-		};
+	// 		// Positions the panel to the northwest of the caret rect.
+	// 		caret_nw: (targetRect, balloonRect) => {
+	// 			return {
+	// 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
+	// 				left: targetRect.right - balloonRect.width,
+	// 				name: "caret_nw",
+	// 			};
+	// 		},
+	// 	};
 
-		// Returns only the last position if it was matched to prevent the panel from jumping after the first match.
-		if (positions.hasOwnProperty(preferredPosition)) {
-			return [positions[preferredPosition]];
+	// 	// Returns only the last position if it was matched to prevent the panel from jumping after the first match.
+	// 	if (positions.hasOwnProperty(preferredPosition)) {
+	// 		return [positions[preferredPosition]];
+	// 	}
+
+	// 	console.log("Got baloon panel positions.");
+
+	// 	// By default return all position callbacks.
+	// 	return [
+	// 		positions.caret_se,
+	// 		positions.caret_sw,
+	// 		positions.caret_ne,
+	// 		positions.caret_nw,
+	// 	];
+	// }
+
+	_getFilteredCards(cardTitle) {
+		this._lastTitleSearched = cardTitle;
+		const filterCards = getFilterCardsCallback(
+			this.editor.config.get("cardconnections.cardList")
+		);
+
+		const filteredCards = filterCards(cardTitle);
+
+		this.fire("getFilteredCards:response", {
+			filteredCards,
+			cardTitle,
+		});
+
+		return;
+	}
+
+	_handleGetFilteredCardsResponse(data) {
+		const { filteredCards, cardTitle } = data;
+
+		if (!isStillCompleting(this.editor)) return;
+
+		this._items.clear();
+
+		for (const card of filteredCards) {
+			this._items.add({ id: card.id.toString(), title: card.title });
 		}
 
-		console.log("Got baloon panel positions.");
+		const cardConnectionMarker =
+			this.editor.model.markers.get("cardconnection");
 
-		// By default return all position callbacks.
-		return [
-			positions.caret_se,
-			positions.caret_sw,
-			positions.caret_ne,
-			positions.caret_nw,
-		];
+		if (this._items.length > 0) {
+			this._showOrUpdateUI(cardConnectionMarker);
+		} else {
+			this._hideUIAndRemoveMarker();
+		}
 	}
 
 	destroy() {
@@ -507,17 +572,73 @@ export default class CardsConnectionPlugin extends Plugin {
 	}
 }
 
-// function filterCardsCallback(cards) {
-// 	return (filterText) => {
-// 		const filteredCards = cards.filter(({ title }) => {
-// 			// The default feed is case insensitive.
-// 			return title.toLowerCase().includes(filterText.toLowerCase());
-// 		});
-// 		// Do not return more than 10 items.
-// 		// .slice(0, 10);
-// 		return filteredCards;
-// 	};
-// }
+function getBalloonPanelPositions(preferredPosition) {
+	console.log("Getting baloon panel positions...");
+
+	const positions = {
+		// Positions the panel to the southeast of the caret rectangle.
+		caret_se: (targetRect) => {
+			return {
+				top: targetRect.bottom + VERTICAL_SPACING,
+				left: targetRect.right,
+				name: "caret_se",
+			};
+		},
+
+		// Positions the panel to the northeast of the caret rectangle.
+		caret_ne: (targetRect, balloonRect) => {
+			return {
+				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
+				left: targetRect.right,
+				name: "caret_ne",
+			};
+		},
+
+		// Positions the panel to the southwest of the caret rectangle.
+		caret_sw: (targetRect, balloonRect) => {
+			return {
+				top: targetRect.bottom + VERTICAL_SPACING,
+				left: targetRect.right - balloonRect.width,
+				name: "caret_sw",
+			};
+		},
+
+		// Positions the panel to the northwest of the caret rect.
+		caret_nw: (targetRect, balloonRect) => {
+			return {
+				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
+				left: targetRect.right - balloonRect.width,
+				name: "caret_nw",
+			};
+		},
+	};
+
+	// Returns only the last position if it was matched to prevent the panel from jumping after the first match.
+	if (positions.hasOwnProperty(preferredPosition)) {
+		return [positions[preferredPosition]];
+	}
+
+	console.log("Got baloon panel positions.");
+
+	// By default return all position callbacks.
+	return [
+		positions.caret_se,
+		positions.caret_sw,
+		positions.caret_ne,
+		positions.caret_nw,
+	];
+}
+
+function getFilterCardsCallback(cardList) {
+	return (filterText) => {
+		const filteredCards = cardList.filter(({ title }) => {
+			return title.toLowerCase().includes(filterText.toLowerCase());
+		});
+		// Do not return more than 10 items.
+		// .slice(0, 10);
+		return filteredCards;
+	};
+}
 
 export function createCardTitleRegExp() {
 	const openAfterCharacters = " \\(\\{\"'.,";
