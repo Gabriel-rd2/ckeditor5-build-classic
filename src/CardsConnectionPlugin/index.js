@@ -41,7 +41,7 @@ export default class CardsConnectionPlugin extends Plugin {
 		this._balloon = editor.plugins.get(ContextualBalloon);
 		this._cardConnectionView = this._createCardConnectionView();
 
-		// this._showUI();
+		this._showUI();
 		// this._setupTextWatcherForShowingUI();
 
 		console.log("CardsConnectionPlugin in custom build was initialized");
@@ -296,21 +296,22 @@ export default class CardsConnectionPlugin extends Plugin {
 
 	_renderItem(item) {
 		const editor = this.editor;
+		const selection = editor.model.document.selection;
+		const cursorPosition = selection.getFirstPosition();
 
 		const buttonView = new ButtonView(editor.locale);
-
 		buttonView.label = item.title;
 		buttonView.withText = true;
 		buttonView.isEnabled = true;
 
 		buttonView.on("execute", (eventInfo) => {
 			const { label } = eventInfo.source;
+			writer.insertText(`[[${label}]]`, selection.focus);
+
 			console.log(label);
 		});
 
-		let view = buttonView;
-
-		return view;
+		return buttonView;
 	}
 
 	_showUI() {
