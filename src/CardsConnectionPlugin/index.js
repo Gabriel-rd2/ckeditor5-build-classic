@@ -384,7 +384,6 @@ export default class CardsConnectionPlugin extends Plugin {
 					marker,
 					this._cardConnectionView.position
 				),
-				// withArrow: false,
 				singleViewMode: true,
 			});
 
@@ -421,6 +420,8 @@ export default class CardsConnectionPlugin extends Plugin {
 				console.log("_getBalloonPanelPositionData().target()...");
 				let modelRange = marker.getRange();
 
+				// Target the UI to the model selection range - the marker has been removed so probably the UI will not be shown anyway.
+				// The logic is used by ContextualBalloon to display another panel in the same place.
 				if (modelRange.start.root.rootName == "$graveyard") {
 					modelRange =
 						editor.model.document.selection.getFirstRange();
@@ -436,7 +437,6 @@ export default class CardsConnectionPlugin extends Plugin {
 			},
 			limiter: () => {
 				console.log("_getBalloonPanelPositionData().limiter()...");
-
 				const view = this.editor.editing.view;
 				const viewDocument = view.document;
 				const editableElement = viewDocument.selection.editableElement;
