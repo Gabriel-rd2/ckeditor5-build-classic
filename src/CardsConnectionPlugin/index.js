@@ -270,6 +270,7 @@ export default class CardsConnectionPlugin extends Plugin {
 			// 	return;
 			// }
 
+			console.log("data.text: ", data.text);
 			const cardTitle = getCardTitleText(data.text);
 			console.log("cardTitle: ", cardTitle);
 			const matchedTextLength = "[[".length + cardTitle.length;
@@ -513,7 +514,7 @@ export default class CardsConnectionPlugin extends Plugin {
 export function createCardTitleRegExp() {
 	const openAfterCharacters = "\\(\\{\"'";
 
-	const marker = "\\[\\[";
+	const marker = "[[";
 
 	const cardTitle = "\\S";
 
