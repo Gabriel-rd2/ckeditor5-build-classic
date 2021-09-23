@@ -428,9 +428,9 @@ export default class CardsConnectionPlugin extends Plugin {
 				}
 
 				editor.model.change((writer) => {
-					writer.createPositionAfter(
-						editor.model.document.selection.focus
-					);
+					const selection = editor.model.document.selection;
+					const cursorPosition = selection.getFirstPosition();
+					writer.createPositionAfter(cursorPosition.parent);
 				});
 
 				const viewRange = mapper.toViewRange(modelRange);
