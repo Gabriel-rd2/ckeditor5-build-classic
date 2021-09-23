@@ -264,46 +264,40 @@ export default class CardsConnectionPlugin extends Plugin {
 			const selection = editor.model.document.selection;
 			const focus = selection.focus;
 
-			// if (hasExistingMention(focus)) {
-			// 	this._hideUIAndRemoveMarker();
-
-			// 	return;
-			// }
-
-			console.log("data.text: ", data.text);
 			const cardTitle = getCardTitleText(data.text);
-			console.log("cardTitle: ", cardTitle);
 			const matchedTextLength = "[[".length + cardTitle.length;
 
+			console.log("data.text: ", data.text);
+			console.log("cardTitle: ", cardTitle);
 			// Create a marker range.
 			const start = focus.getShiftedBy(-matchedTextLength);
 			const end = focus.getShiftedBy(-cardTitle.length);
-
 			const markerRange = editor.model.createRange(start, end);
 
-			// if (checkIfStillInCompletionMode(editor)) {
-			// 	const mentionMarker = editor.model.markers.get("mention");
+			if (isStillCompleting(editor)) {
+				const cardConnectionMarker =
+					editor.model.markers.get("cardconnection");
+				editor.model.change((writer) => {
+					writer.updateMarker(cardConnectionMarker, {
+						range: markerRange,
+					});
+				});
+			} else {
+				editor.model.change((writer) => {
+					writer.addMarker("cardconnection", {
+						range: markerRange,
+						usingOperation: false,
+						affectsData: false,
+					});
+				});
+			}
 
-			// 	// Update the marker - user might've moved the selection to other mention trigger.
-			// 	editor.model.change((writer) => {
-			// 		writer.updateMarker(mentionMarker, { range: markerRange });
-			// 	});
-			// } else {
-			// editor.model.change((writer) => {
-			// 	writer.addMarker("cardconnection:marker", {
-			// 		range: markerRange,
-			// 		usingOperation: false,
-			// 		affectsData: false,
-			// 	});
-			// });
-			// }
-
-			// this._requestFeedDebounced(marker, feedText);
+			// this._requestFeedDebounced(marker, cardTitle);
 		});
 
-		// watcher.on("unmatched", () => {
-		// 	this._hideUIAndRemoveMarker();
-		// });
+		watcher.on("unmatched", () => {
+			this._hideUIAndRemoveMarker();
+		});
 
 		// const mentionCommand = editor.commands.get("mention");
 		// watcher.bind("isEnabled").to(mentionCommand);
@@ -399,6 +393,20 @@ export default class CardsConnectionPlugin extends Plugin {
 		}
 
 		this._cardConnectionView.position = undefined;
+	}
+
+	_hideUIAndRemoveMarker() {
+		// if (this._balloon.hasView(this._cardConnectionView)) {
+		// 	this._balloon.remove(this._cardConnectionView);
+		// }
+
+		if (isStillInCompleting(this.editor)) {
+			this.editor.model.change((writer) =>
+				writer.removeMarker("mention")
+			);
+		}
+
+		// this._cardConnectionView.position = undefined;
 	}
 
 	_getBalloonPanelPositionData(preferredPosition) {
@@ -513,6 +521,7 @@ export default class CardsConnectionPlugin extends Plugin {
 
 export function createCardTitleRegExp() {
 	const openAfterCharacters = " \\(\\{\"'.,";
+	// const beggining = "[^\[]*";
 
 	const marker = "\\[\\[";
 
@@ -539,4 +548,8 @@ function getCardTitleText(text) {
 	const regExp = createCardTitleRegExp();
 	const match = text.match(regExp);
 	return match[2];
+}
+
+function isStillCompleting(editor) {
+	return editor.model.markers.has("cardconnection");
 }
