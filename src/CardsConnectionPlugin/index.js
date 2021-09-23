@@ -41,7 +41,7 @@ export default class CardsConnectionPlugin extends Plugin {
 		this._balloon = editor.plugins.get(ContextualBalloon);
 		this._cardConnectionView = this._createCardConnectionView();
 
-		this._showUI();
+		// this._showUI();
 		// this._setupTextWatcherForShowingUI();
 
 		console.log("CardsConnectionPlugin in custom build was initialized");
@@ -299,7 +299,6 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		const buttonView = new ButtonView(editor.locale);
 
-		// buttonView.id = item.id.toString();
 		buttonView.label = item.title;
 		buttonView.withText = true;
 		buttonView.isEnabled = true;
