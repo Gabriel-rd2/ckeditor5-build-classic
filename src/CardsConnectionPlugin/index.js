@@ -288,7 +288,7 @@ export default class CardsConnectionPlugin extends Plugin {
 			// 	});
 			// } else {
 			editor.model.change((writer) => {
-				writer.addMarker("cardconnection", {
+				writer.addMarker("cardconnection:marker", {
 					range: markerRange,
 					usingOperation: false,
 					affectsData: false,
