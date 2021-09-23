@@ -271,6 +271,7 @@ export default class CardsConnectionPlugin extends Plugin {
 			// }
 
 			const cardTitle = getCardTitleText(data.text);
+			console.log("cardTitle: ", cardTitle);
 			const matchedTextLength = "[[".length + cardTitle.length;
 
 			// Create a marker range.
@@ -287,13 +288,13 @@ export default class CardsConnectionPlugin extends Plugin {
 			// 		writer.updateMarker(mentionMarker, { range: markerRange });
 			// 	});
 			// } else {
-			editor.model.change((writer) => {
-				writer.addMarker("cardconnection:marker", {
-					range: markerRange,
-					usingOperation: false,
-					affectsData: false,
-				});
-			});
+			// editor.model.change((writer) => {
+			// 	writer.addMarker("cardconnection:marker", {
+			// 		range: markerRange,
+			// 		usingOperation: false,
+			// 		affectsData: false,
+			// 	});
+			// });
 			// }
 
 			// this._requestFeedDebounced(marker, feedText);
