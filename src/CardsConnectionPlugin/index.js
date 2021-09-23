@@ -306,8 +306,10 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		buttonView.on("execute", (eventInfo) => {
 			const { label } = eventInfo.source;
-			writer.insertText(`[[${label}]]`, selection.focus);
-
+			editor.model.change((writer) => {
+				writer.insertText(`[[${label}]]`, selection.focus);
+				this._hideUI();
+			});
 			console.log(label);
 		});
 
@@ -329,6 +331,14 @@ export default class CardsConnectionPlugin extends Plugin {
 		this._cardConnectionView.position = this._balloon.view.position;
 
 		console.log("Showed UI.");
+	}
+
+	_hideUI() {
+		if (this._balloon.hasView(this._cardConnectionView)) {
+			this._balloon.remove(this._cardConnectionView);
+		}
+
+		this._cardConnectionView.position = undefined;
 	}
 
 	_getBalloonPanelPositionData(preferredPosition) {
