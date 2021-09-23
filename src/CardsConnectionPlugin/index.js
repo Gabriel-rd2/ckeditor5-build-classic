@@ -512,7 +512,7 @@ export default class CardsConnectionPlugin extends Plugin {
 export function createCardTitleRegExp() {
 	const openAfterCharacters = "\\(\\{\"'";
 
-	const marker = "[[";
+	const marker = "\\[\\[";
 
 	const cardTitle = "\\S";
 
