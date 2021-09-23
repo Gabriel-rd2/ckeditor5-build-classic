@@ -384,7 +384,7 @@ export default class CardsConnectionPlugin extends Plugin {
 					marker,
 					this._cardConnectionView.position
 				),
-				withArrow: false,
+				// withArrow: false,
 				singleViewMode: true,
 			});
 
@@ -512,42 +512,49 @@ function getBalloonPanelPositions(preferredPosition) {
 	const positions = {
 		// Positions the panel to the southeast of the caret rectangle.
 		caret_se: (targetRect) => {
-			console.log("caret_se()...");
 			return {
 				top: targetRect.bottom + VERTICAL_SPACING,
 				left: targetRect.right,
 				name: "caret_se",
+				config: {
+					withArrow: false,
+				},
 			};
 		},
 
 		// Positions the panel to the northeast of the caret rectangle.
 		caret_ne: (targetRect, balloonRect) => {
-			console.log("caret_ne()...");
 			return {
 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
 				left: targetRect.right,
 				name: "caret_ne",
+				config: {
+					withArrow: false,
+				},
 			};
 		},
 
 		// Positions the panel to the southwest of the caret rectangle.
 		caret_sw: (targetRect, balloonRect) => {
-			console.log("caret_sw()...");
-
 			return {
 				top: targetRect.bottom + VERTICAL_SPACING,
 				left: targetRect.right - balloonRect.width,
 				name: "caret_sw",
+				config: {
+					withArrow: false,
+				},
 			};
 		},
 
 		// Positions the panel to the northwest of the caret rect.
 		caret_nw: (targetRect, balloonRect) => {
-			console.log("caret_nw()...");
 			return {
 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
 				left: targetRect.right - balloonRect.width,
 				name: "caret_nw",
+				config: {
+					withArrow: false,
+				},
 			};
 		},
 	};
@@ -567,7 +574,6 @@ function getBalloonPanelPositions(preferredPosition) {
 		positions.caret_nw,
 	];
 }
-
 function getFilterCardsCallback(cardList) {
 	console.log("getFilterCardsCallback()...");
 	return (filterText) => {
