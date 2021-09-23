@@ -307,9 +307,9 @@ export default class CardsConnectionPlugin extends Plugin {
 			const { label } = eventInfo.source;
 			editor.model.change((writer) => {
 				writer.insertText(`[[${label}]]`, selection.focus);
-				editor.execute("cardconnection", { editor });
 				this._hideUI();
 			});
+			editor.execute("cardconnection", { editor });
 			console.log(label);
 		});
 
