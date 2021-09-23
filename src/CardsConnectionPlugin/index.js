@@ -512,11 +512,12 @@ export default class CardsConnectionPlugin extends Plugin {
 // }
 
 export function createCardTitleRegExp() {
-	const openAfterCharacters = "\\(\\{\"'";
+	// const openAfterCharacters = "\\(\\{\"'";
+	const openAfterCharacters = /([^*]+)/;
 
-	const marker = "[[";
+	const marker = /(\[\[)/;
 
-	const cardTitle = "\\S";
+	const cardTitle = /\\S/;
 
 	// O padrão consiste em 3 grupos:
 	// - 0: começo - Início da linha, espaço ou caractere de pontuação como "(" or "\", a não ser "["",
