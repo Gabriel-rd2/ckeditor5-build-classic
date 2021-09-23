@@ -408,40 +408,6 @@ export default class CardsConnectionPlugin extends Plugin {
 		this._cardConnectionView.position = undefined;
 	}
 
-	// _getBalloonPanelPositionData(preferredPosition) {
-	// 	console.log("Getting baloon panel position data...");
-	// 	const editor = this.editor;
-	// 	const editing = editor.editing;
-	// 	const domConverter = editing.view.domConverter;
-	// 	const mapper = editing.mapper;
-	// 	const selection = editor.model.document.selection;
-	// 	const cursorPosition = selection.getFirstPosition();
-
-	// 	let rangeBefore;
-	// 	editor.model.change((writer) => {
-	// 		rangeBefore = writer.createRange(
-	// 			writer.createPositionAt(cursorPosition.parent, 0),
-	// 			cursorPosition
-	// 		);
-	// 	});
-
-	// 	return {
-	// 		target: mapper.toViewRange(rangeBefore),
-	// 		limiter: () => {
-	// 			const view = this.editor.editing.view;
-	// 			const viewDocument = view.document;
-	// 			const editableElement = viewDocument.selection.editableElement;
-
-	// 			if (editableElement) {
-	// 				console.log("has editableElement limiter!");
-	// 				return view.domConverter.mapViewToDom(editableElement.root);
-	// 			}
-
-	// 			return null;
-	// 		},
-	// 		positions: this.getBalloonPanelPositions(preferredPosition),
-	// 	};
-	// }
 	_getBalloonPanelPositionData(marker, preferredPosition) {
 		console.log("CardsConnectionPlugin._getBalloonPanelPositionData()...");
 
@@ -452,6 +418,7 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		return {
 			target: () => {
+				console.log("_getBalloonPanelPositionData().target()...");
 				let modelRange = marker.getRange();
 
 				if (modelRange.start.root.rootName == "$graveyard") {
@@ -464,9 +431,12 @@ export default class CardsConnectionPlugin extends Plugin {
 					domConverter.viewRangeToDom(viewRange)
 				);
 
+				console.log("_getBalloonPanelPositionData().target() ended.");
 				return rangeRects.pop();
 			},
 			limiter: () => {
+				console.log("_getBalloonPanelPositionData().limiter()...");
+
 				const view = this.editor.editing.view;
 				const viewDocument = view.document;
 				const editableElement = viewDocument.selection.editableElement;
@@ -475,68 +445,12 @@ export default class CardsConnectionPlugin extends Plugin {
 					return view.domConverter.mapViewToDom(editableElement.root);
 				}
 
+				console.log("_getBalloonPanelPositionData().limiter() ended.");
 				return null;
 			},
 			positions: getBalloonPanelPositions(preferredPosition),
 		};
 	}
-
-	// getBalloonPanelPositions(preferredPosition) {
-	// 	console.log("Getting baloon panel positions...");
-
-	// 	const positions = {
-	// 		// Positions the panel to the southeast of the caret rectangle.
-	// 		caret_se: (targetRect) => {
-	// 			return {
-	// 				top: targetRect.bottom + VERTICAL_SPACING,
-	// 				left: targetRect.right,
-	// 				name: "caret_se",
-	// 			};
-	// 		},
-
-	// 		// Positions the panel to the northeast of the caret rectangle.
-	// 		caret_ne: (targetRect, balloonRect) => {
-	// 			return {
-	// 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
-	// 				left: targetRect.right,
-	// 				name: "caret_ne",
-	// 			};
-	// 		},
-
-	// 		// Positions the panel to the southwest of the caret rectangle.
-	// 		caret_sw: (targetRect, balloonRect) => {
-	// 			return {
-	// 				top: targetRect.bottom + VERTICAL_SPACING,
-	// 				left: targetRect.right - balloonRect.width,
-	// 				name: "caret_sw",
-	// 			};
-	// 		},
-
-	// 		// Positions the panel to the northwest of the caret rect.
-	// 		caret_nw: (targetRect, balloonRect) => {
-	// 			return {
-	// 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
-	// 				left: targetRect.right - balloonRect.width,
-	// 				name: "caret_nw",
-	// 			};
-	// 		},
-	// 	};
-
-	// 	// Returns only the last position if it was matched to prevent the panel from jumping after the first match.
-	// 	if (positions.hasOwnProperty(preferredPosition)) {
-	// 		return [positions[preferredPosition]];
-	// 	}
-
-	// 	console.log("Got baloon panel positions.");
-
-	// 	// By default return all position callbacks.
-	// 	return [
-	// 		positions.caret_se,
-	// 		positions.caret_sw,
-	// 		positions.caret_ne,
-	// 		positions.caret_nw,
-	// 	];
-	// }
 
 	_getFilteredCards(cardTitle) {
 		console.log("_getFilteredCards()...");
@@ -598,6 +512,7 @@ function getBalloonPanelPositions(preferredPosition) {
 	const positions = {
 		// Positions the panel to the southeast of the caret rectangle.
 		caret_se: (targetRect) => {
+			console.log("caret_se()...");
 			return {
 				top: targetRect.bottom + VERTICAL_SPACING,
 				left: targetRect.right,
@@ -607,6 +522,7 @@ function getBalloonPanelPositions(preferredPosition) {
 
 		// Positions the panel to the northeast of the caret rectangle.
 		caret_ne: (targetRect, balloonRect) => {
+			console.log("caret_ne()...");
 			return {
 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
 				left: targetRect.right,
@@ -616,6 +532,8 @@ function getBalloonPanelPositions(preferredPosition) {
 
 		// Positions the panel to the southwest of the caret rectangle.
 		caret_sw: (targetRect, balloonRect) => {
+			console.log("caret_sw()...");
+
 			return {
 				top: targetRect.bottom + VERTICAL_SPACING,
 				left: targetRect.right - balloonRect.width,
@@ -625,6 +543,7 @@ function getBalloonPanelPositions(preferredPosition) {
 
 		// Positions the panel to the northwest of the caret rect.
 		caret_nw: (targetRect, balloonRect) => {
+			console.log("caret_nw()...");
 			return {
 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
 				left: targetRect.right - balloonRect.width,
