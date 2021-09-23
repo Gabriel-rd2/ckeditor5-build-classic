@@ -38,6 +38,8 @@ export default class CardsConnectionPlugin extends Plugin {
 		// Adiciona um TextWatcher para encontrar o padrão [[*]] no texto e disparar o comando adicionado acima
 		this._setupTextWatcherForReplacingTitle();
 
+		// const filterCardsCallback = (
+
 		this._balloon = editor.plugins.get(ContextualBalloon);
 		this._cardConnectionView = this._createCardConnectionView();
 
@@ -251,6 +253,62 @@ export default class CardsConnectionPlugin extends Plugin {
 			editor.execute("cardconnection", { editor })
 		);
 	}
+	// _setupTextWatcherForFeed(marker, minimumCharacters) {
+	// 	const editor = this.editor;
+
+	// 	const watcher = new TextWatcher(
+	// 		editor.model,
+	// 		createTestCallback(marker, minimumCharacters)
+	// 	);
+
+	// 	watcher.on("matched", (evt, data) => {
+	// 		const selection = editor.model.document.selection;
+	// 		const focus = selection.focus;
+
+	// 		if (hasExistingMention(focus)) {
+	// 			this._hideUIAndRemoveMarker();
+
+	// 			return;
+	// 		}
+
+	// 		const feedText = requestFeedText(marker, data.text);
+	// 		const matchedTextLength = marker.length + feedText.length;
+
+	// 		// Create a marker range.
+	// 		const start = focus.getShiftedBy(-matchedTextLength);
+	// 		const end = focus.getShiftedBy(-feedText.length);
+
+	// 		const markerRange = editor.model.createRange(start, end);
+
+	// 		if (checkIfStillInCompletionMode(editor)) {
+	// 			const mentionMarker = editor.model.markers.get("mention");
+
+	// 			// Update the marker - user might've moved the selection to other mention trigger.
+	// 			editor.model.change((writer) => {
+	// 				writer.updateMarker(mentionMarker, { range: markerRange });
+	// 			});
+	// 		} else {
+	// 			editor.model.change((writer) => {
+	// 				writer.addMarker("mention", {
+	// 					range: markerRange,
+	// 					usingOperation: false,
+	// 					affectsData: false,
+	// 				});
+	// 			});
+	// 		}
+
+	// 		this._requestFeedDebounced(marker, feedText);
+	// 	});
+
+	// 	watcher.on("unmatched", () => {
+	// 		this._hideUIAndRemoveMarker();
+	// 	});
+
+	// 	const mentionCommand = editor.commands.get("mention");
+	// 	watcher.bind("isEnabled").to(mentionCommand);
+
+	// 	return watcher;
+	// }
 
 	_createCardConnectionView() {
 		console.log("Creating CardConnectionView...");
@@ -306,8 +364,10 @@ export default class CardsConnectionPlugin extends Plugin {
 		buttonView.on("execute", (eventInfo) => {
 			const { label } = eventInfo.source;
 			editor.model.change((writer) => {
-				writer.insertText(`[[${label}]]`, selection.focus);
+				const text = writer.createText(`[[${label}]]`);
+				editor.model.insertContent(text, selection.focus);
 				this._hideUI();
+				writer.setSelection(writer.createPositionAfter(text));
 			});
 			console.log(label);
 		});
@@ -437,3 +497,36 @@ export default class CardsConnectionPlugin extends Plugin {
 		this._cardConnectionView.destroy();
 	}
 }
+
+// function filterCardsCallback(cards) {
+// 	return (filterText) => {
+// 		const filteredCards = cards.filter(({ title }) => {
+// 			// The default feed is case insensitive.
+// 			return title.toLowerCase().includes(filterText.toLowerCase());
+// 		});
+// 		// Do not return more than 10 items.
+// 		// .slice(0, 10);
+// 		return filteredCards;
+// 	};
+// }
+
+// export function createRegExp() {
+// 	const numberOfCharacters =
+// 		minimumCharacters == 0 ? "*" : `{${minimumCharacters},}`;
+
+// 	const openAfterCharacters = env.features.isRegExpUnicodePropertySupported
+// 		? "\\p{Ps}\\p{Pi}\"'"
+// 		: "\\(\\[{\"'";
+// 	const mentionCharacters = "\\S";
+
+// 	// The pattern consists of 3 groups:
+// 	// - 0 (non-capturing): Opening sequence - start of the line, space or an opening punctuation character like "(" or "\"",
+// 	// - 1: The marker character,
+// 	// - 2: Mention input (taking the minimal length into consideration to trigger the UI),
+// 	//
+// 	// The pattern matches up to the caret (end of string switch - $).
+// 	//               (0:      opening sequence       )(1:  marker   )(2:                typed mention                 )$
+// 	const pattern = `(?:^|[ ${openAfterCharacters}])([${marker}])([${mentionCharacters}]${numberOfCharacters})$`;
+
+// 	return new RegExp(pattern, "u");
+// }
