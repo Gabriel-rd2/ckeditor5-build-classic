@@ -427,7 +427,12 @@ export default class CardsConnectionPlugin extends Plugin {
 						editor.model.document.selection.getFirstRange();
 				}
 
+				editor.model.change((writer) => {
+					writer.createPositionAfter(modelRange.end);
+				});
+
 				const viewRange = mapper.toViewRange(modelRange);
+				console.log("chegou");
 				const rangeRects = Rect.getDomRangeRects(
 					domConverter.viewRangeToDom(viewRange)
 				);
