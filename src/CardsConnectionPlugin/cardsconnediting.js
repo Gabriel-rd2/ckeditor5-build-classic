@@ -8,19 +8,22 @@ export default class CardsConnectionEditing extends Plugin {
 	}
 
 	init() {
+		console.log("CardsConnectionEditing.init()...");
+
+		const editor = this.editor;
+
 		// Define novos componentes para o modelo interno do CkEditor
 		this._defineSchema();
-
 		// Define políticas para as conversões entre as views de dados, edição e o modelo
 		this._defineConverters();
 
-		// Adiciona o novo commando para substituir o padrão [[*]] por um link para um card de título "*"
-		this.editor.commands.add(
+		// Adiciona o commando que substitui o padrão [[*]] por um link para um card de título "*"
+		editor.commands.add(
 			"cardconnection",
-			new CardConnectionCommand(this.editor)
+			new CardConnectionCommand(editor)
 		);
 
-		console.log("CardsConnectionEditing in custom build was initialized");
+		console.log("CardsConnectionEditing.init() ended.");
 	}
 
 	_defineSchema() {
