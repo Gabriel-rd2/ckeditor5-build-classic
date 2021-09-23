@@ -39,11 +39,12 @@ export default class CardsConnectionPlugin extends Plugin {
 		this._setupTextWatcherForReplacingTitle();
 
 		// const filterCardsCallback = (
+		this._setupTextWatcherForMarkingModel();
 
 		this._balloon = editor.plugins.get(ContextualBalloon);
 		this._cardConnectionView = this._createCardConnectionView();
 
-		this._showUI();
+		// this._showUI();
 		// this._setupTextWatcherForShowingUI();
 
 		console.log("CardsConnectionPlugin in custom build was initialized");
@@ -253,62 +254,60 @@ export default class CardsConnectionPlugin extends Plugin {
 			editor.execute("cardconnection", { editor })
 		);
 	}
-	// _setupTextWatcherForFeed(marker, minimumCharacters) {
-	// 	const editor = this.editor;
 
-	// 	const watcher = new TextWatcher(
-	// 		editor.model,
-	// 		createTestCallback(marker, minimumCharacters)
-	// 	);
+	_setupTextWatcherForMarkingModel() {
+		const editor = this.editor;
 
-	// 	watcher.on("matched", (evt, data) => {
-	// 		const selection = editor.model.document.selection;
-	// 		const focus = selection.focus;
+		const watcher = new TextWatcher(editor.model, createTestCallback());
 
-	// 		if (hasExistingMention(focus)) {
-	// 			this._hideUIAndRemoveMarker();
+		watcher.on("matched", (evt, data) => {
+			const selection = editor.model.document.selection;
+			const focus = selection.focus;
 
-	// 			return;
-	// 		}
+			// if (hasExistingMention(focus)) {
+			// 	this._hideUIAndRemoveMarker();
 
-	// 		const feedText = requestFeedText(marker, data.text);
-	// 		const matchedTextLength = marker.length + feedText.length;
+			// 	return;
+			// }
 
-	// 		// Create a marker range.
-	// 		const start = focus.getShiftedBy(-matchedTextLength);
-	// 		const end = focus.getShiftedBy(-feedText.length);
+			const cardTitle = getCardTitleText(data.text);
+			const matchedTextLength = "[[".length + cardTitle.length;
 
-	// 		const markerRange = editor.model.createRange(start, end);
+			// Create a marker range.
+			const start = focus.getShiftedBy(-matchedTextLength);
+			const end = focus.getShiftedBy(-cardTitle.length);
 
-	// 		if (checkIfStillInCompletionMode(editor)) {
-	// 			const mentionMarker = editor.model.markers.get("mention");
+			const markerRange = editor.model.createRange(start, end);
 
-	// 			// Update the marker - user might've moved the selection to other mention trigger.
-	// 			editor.model.change((writer) => {
-	// 				writer.updateMarker(mentionMarker, { range: markerRange });
-	// 			});
-	// 		} else {
-	// 			editor.model.change((writer) => {
-	// 				writer.addMarker("mention", {
-	// 					range: markerRange,
-	// 					usingOperation: false,
-	// 					affectsData: false,
-	// 				});
-	// 			});
-	// 		}
+			// if (checkIfStillInCompletionMode(editor)) {
+			// 	const mentionMarker = editor.model.markers.get("mention");
 
-	// 		this._requestFeedDebounced(marker, feedText);
-	// 	});
+			// 	// Update the marker - user might've moved the selection to other mention trigger.
+			// 	editor.model.change((writer) => {
+			// 		writer.updateMarker(mentionMarker, { range: markerRange });
+			// 	});
+			// } else {
+			editor.model.change((writer) => {
+				writer.addMarker("cardconnection", {
+					range: markerRange,
+					usingOperation: false,
+					affectsData: false,
+				});
+			});
+			// }
 
-	// 	watcher.on("unmatched", () => {
-	// 		this._hideUIAndRemoveMarker();
-	// 	});
+			// this._requestFeedDebounced(marker, feedText);
+		});
 
-	// 	const mentionCommand = editor.commands.get("mention");
-	// 	watcher.bind("isEnabled").to(mentionCommand);
+		// watcher.on("unmatched", () => {
+		// 	this._hideUIAndRemoveMarker();
+		// });
 
-	// 	return watcher;
-	// }
+		// const mentionCommand = editor.commands.get("mention");
+		// watcher.bind("isEnabled").to(mentionCommand);
+
+		// return watcher;
+	}
 
 	_createCardConnectionView() {
 		console.log("Creating CardConnectionView...");
@@ -510,23 +509,32 @@ export default class CardsConnectionPlugin extends Plugin {
 // 	};
 // }
 
-// export function createRegExp() {
-// 	const numberOfCharacters =
-// 		minimumCharacters == 0 ? "*" : `{${minimumCharacters},}`;
+export function createCardTitleRegExp() {
+	const openAfterCharacters = "\\(\\{\"'";
 
-// 	const openAfterCharacters = env.features.isRegExpUnicodePropertySupported
-// 		? "\\p{Ps}\\p{Pi}\"'"
-// 		: "\\(\\[{\"'";
-// 	const mentionCharacters = "\\S";
+	const marker = "[[";
 
-// 	// The pattern consists of 3 groups:
-// 	// - 0 (non-capturing): Opening sequence - start of the line, space or an opening punctuation character like "(" or "\"",
-// 	// - 1: The marker character,
-// 	// - 2: Mention input (taking the minimal length into consideration to trigger the UI),
-// 	//
-// 	// The pattern matches up to the caret (end of string switch - $).
-// 	//               (0:      opening sequence       )(1:  marker   )(2:                typed mention                 )$
-// 	const pattern = `(?:^|[ ${openAfterCharacters}])([${marker}])([${mentionCharacters}]${numberOfCharacters})$`;
+	const cardTitle = "\\S";
 
-// 	return new RegExp(pattern, "u");
-// }
+	// O padrão consiste em 3 grupos:
+	// - 0: começo - Início da linha, espaço ou caractere de pontuação como "(" or "\", a não ser "["",
+	// - 1: marcador - "[[",
+	// - 2: título - Caracteres quaisquer do título do card (um já é suficiente para mostrar a UI),
+	//
+	// A expressão faz o match até o cursor (end of string switch - $).
+	//               (0:      começo               )(1: marcador)(2:   título    )$
+	const pattern = `(?:^|[ ${openAfterCharacters}])([${marker}])([${cardTitle}]*)$`;
+
+	return new RegExp(pattern);
+}
+
+function createTestCallback(marker, minimumCharacters) {
+	const regExp = createCardTitleRegExp(marker, minimumCharacters);
+	return (text) => regExp.test(text);
+}
+
+function getCardTitleText(text) {
+	const regExp = createCardTitleRegExp();
+	const match = text.match(regExp);
+	return match[2];
+}
