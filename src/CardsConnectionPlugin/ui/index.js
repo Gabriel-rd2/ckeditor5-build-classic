@@ -124,7 +124,7 @@ export default class CardsConnectionUI extends Plugin {
 			const focus = selection.focus;
 
 			const cardTitle = getCardTitleText(data.text);
-			const matchedTextLength = "[".length + cardTitle.length;
+			const matchedTextLength = "[[".length + cardTitle.length;
 
 			console.log("data.text: ", data.text);
 			console.log("cardTitle: ", cardTitle);
@@ -215,6 +215,7 @@ export default class CardsConnectionUI extends Plugin {
 					marker,
 					this._cardConnectionView.position
 				),
+				withArrow: false,
 				singleViewMode: true,
 			});
 
@@ -280,11 +281,11 @@ export default class CardsConnectionUI extends Plugin {
 						editor.model.document.selection.getFirstRange();
 				}
 
-				editor.model.change((writer) => {
-					const selection = editor.model.document.selection;
-					const cursorPosition = selection.getFirstPosition();
-					writer.createPositionAfter(cursorPosition.parent);
-				});
+				// editor.model.change((writer) => {
+				// 	const selection = editor.model.document.selection;
+				// 	const cursorPosition = selection.getFirstPosition();
+				// 	writer.createPositionAfter(cursorPosition.parent);
+				// });
 
 				const viewRange = mapper.toViewRange(modelRange);
 				console.log("chegou");
@@ -323,9 +324,9 @@ function getBalloonPanelPositions(preferredPosition) {
 				top: targetRect.bottom + VERTICAL_SPACING,
 				left: targetRect.right,
 				name: "caret_se",
-				config: {
-					withArrow: false,
-				},
+				// config: {
+				// 	withArrow: false,
+				// },
 			};
 		},
 
@@ -335,9 +336,9 @@ function getBalloonPanelPositions(preferredPosition) {
 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
 				left: targetRect.right,
 				name: "caret_ne",
-				config: {
-					withArrow: false,
-				},
+				// config: {
+				// 	withArrow: false,
+				// },
 			};
 		},
 
@@ -347,9 +348,9 @@ function getBalloonPanelPositions(preferredPosition) {
 				top: targetRect.bottom + VERTICAL_SPACING,
 				left: targetRect.right - balloonRect.width,
 				name: "caret_sw",
-				config: {
-					withArrow: false,
-				},
+				// config: {
+				// 	withArrow: false,
+				// },
 			};
 		},
 
@@ -359,15 +360,16 @@ function getBalloonPanelPositions(preferredPosition) {
 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
 				left: targetRect.right - balloonRect.width,
 				name: "caret_nw",
-				config: {
-					withArrow: false,
-				},
+				// config: {
+				// 	withArrow: false,
+				// },
 			};
 		},
 	};
 
 	// Returns only the last position if it was matched to prevent the panel from jumping after the first match.
 	if (Object.prototype.hasOwnProperty.call(positions, preferredPosition)) {
+		console.log("getBalloonPanelPositions() RETURNING PREFERRED POSITION");
 		return [positions[preferredPosition]];
 	}
 
@@ -416,8 +418,10 @@ function getCardTitleText(text) {
 function getFilterCardsCallback(cardList) {
 	console.log("getFilterCardsCallback()...");
 	return (filterText) => {
-		const filteredCards = cardList.filter(({ title }) =>
-			title.toLowerCase().includes(filterText.toLowerCase())
+		const filteredCards = cardList.filter(
+			({ title }) =>
+				title.toLowerCase().includes(filterText.toLowerCase()) &&
+				!!filterText
 		);
 		// Do not return more than 10 items.
 		// .slice(0, 10);
