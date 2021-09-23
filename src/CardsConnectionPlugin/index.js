@@ -651,14 +651,10 @@ function getBalloonPanelPositions(preferredPosition) {
 
 function getFilterCardsCallback(cardList) {
 	console.log("getFilterCardsCallback()...");
-	console.log("cardList: ", cardList);
 	return (filterText) => {
-		const filteredCards = cardList.filter(({ title }) => {
-			return (
-				title.toLowerCase().includes(filterText.toLowerCase()) ||
-				title === undefined
-			);
-		});
+		const filteredCards = cardList.filter(({ title }) =>
+			title.toLowerCase().includes(filterText.toLowerCase())
+		);
 		// Do not return more than 10 items.
 		// .slice(0, 10);
 		return filteredCards;
