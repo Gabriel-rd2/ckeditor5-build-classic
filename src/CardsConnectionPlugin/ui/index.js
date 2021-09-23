@@ -124,7 +124,7 @@ export default class CardsConnectionUI extends Plugin {
 			const focus = selection.focus;
 
 			const cardTitle = getCardTitleText(data.text);
-			const matchedTextLength = "[[".length + cardTitle.length;
+			const matchedTextLength = "[".length + cardTitle.length;
 
 			console.log("data.text: ", data.text);
 			console.log("cardTitle: ", cardTitle);
