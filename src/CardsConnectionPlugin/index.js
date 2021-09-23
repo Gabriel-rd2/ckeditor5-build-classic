@@ -541,12 +541,11 @@ export default class CardsConnectionPlugin extends Plugin {
 	_getFilteredCards(cardTitle) {
 		console.log("_getFilteredCards()...");
 		this._lastTitleSearched = cardTitle;
-		const filterCards = getFilterCardsCallback(
-			this.editor.config.get("cardconnections.cardList")
-		);
+		const cardList = this.editor.config.get("cardconnections.cardList");
+		const filterCards = getFilterCardsCallback(cardList);
 
+		console.log("cardTitle: ", cardTitle);
 		const filteredCards = filterCards(cardTitle);
-		console.log("filteredCards: ", filteredCards);
 
 		this.fire("getFilteredCards:response", {
 			filteredCards,
@@ -563,6 +562,8 @@ export default class CardsConnectionPlugin extends Plugin {
 		);
 		const { filteredCards, cardTitle } = data;
 
+		console.log("filteredCards: ", filteredCards);
+		console.log("cardTitle: ", cardTitle);
 		if (!isStillCompleting(this.editor)) return;
 
 		this._items.clear();
@@ -649,6 +650,8 @@ function getBalloonPanelPositions(preferredPosition) {
 }
 
 function getFilterCardsCallback(cardList) {
+	console.log("getFilterCardsCallback()...");
+	console.log("cardList: ", cardList);
 	return (filterText) => {
 		const filteredCards = cardList.filter(({ title }) => {
 			return (
