@@ -23,6 +23,8 @@ export default class CardsConnectionPlugin extends Plugin {
 	}
 
 	init() {
+		console.log("CardsConnectionPlugin.init()...");
+
 		const editor = this.editor;
 
 		// Define novos componentes para o modelo interno do CkEditor
@@ -48,7 +50,7 @@ export default class CardsConnectionPlugin extends Plugin {
 			this._handleGetFilteredCardsResponse(data)
 		);
 
-		console.log("CardsConnectionPlugin in custom build was initialized");
+		console.log("CardsConnectionPlugin.init() ended.");
 	}
 
 	get _isUIVisible() {
@@ -261,6 +263,9 @@ export default class CardsConnectionPlugin extends Plugin {
 	}
 
 	_setupTextWatcherForMarkingModel() {
+		console.log(
+			"CardsConnectionPlugin._setupTextWatcherForMarkingModel()..."
+		);
 		const editor = this.editor;
 
 		const watcher = new TextWatcher(editor.model, createTestCallback());
@@ -301,15 +306,20 @@ export default class CardsConnectionPlugin extends Plugin {
 		});
 
 		watcher.on("unmatched", () => {
+			console.log("marking model watcher unmatched!");
 			this._hideUIAndRemoveMarker();
 		});
 
 		// const cardConnectionCommand = editor.commands.get("cardconnection");
 		// watcher.bind("isEnabled").to(cardConnectionCommand);
+
+		console.log(
+			"CardsConnectionPlugin._setupTextWatcherForMarkingModel() ended."
+		);
 	}
 
 	_createCardConnectionView() {
-		console.log("Creating CardConnectionView...");
+		console.log("CardsConnectionPlugin._createCardConnectionView()...");
 		const editor = this.editor;
 		const locale = this.editor.locale;
 
@@ -329,7 +339,7 @@ export default class CardsConnectionPlugin extends Plugin {
 			return listItemView;
 		});
 
-		console.log("Created CardConnectionView.");
+		console.log("CardsConnectionPlugin._createCardConnectionView() ended.");
 
 		return cardConnectionView;
 	}
@@ -351,14 +361,13 @@ export default class CardsConnectionPlugin extends Plugin {
 				this._hideUI();
 				writer.setSelection(writer.createPositionAfter(text));
 			});
-			console.log(label);
 		});
 
 		return buttonView;
 	}
 
 	_showOrUpdateUI(marker) {
-		console.log("Showing UI...");
+		console.log("CardsConnectionPlugin._showOrUpdateUI()...");
 
 		if (this._isUIVisible) {
 			// Update balloon position as the mention list view may change its size.
@@ -381,7 +390,7 @@ export default class CardsConnectionPlugin extends Plugin {
 
 			this._cardConnectionView.position = this._balloon.view.position;
 			// this._mentionsView.selectFirst();
-			console.log("Showed UI.");
+			console.log("CardsConnectionPlugin._showOrUpdateUI() ended.");
 		}
 	}
 
@@ -392,7 +401,7 @@ export default class CardsConnectionPlugin extends Plugin {
 
 		if (isStillCompleting(this.editor)) {
 			this.editor.model.change((writer) =>
-				writer.removeMarker("mention")
+				writer.removeMarker("cardconnection")
 			);
 		}
 
@@ -434,7 +443,7 @@ export default class CardsConnectionPlugin extends Plugin {
 	// 	};
 	// }
 	_getBalloonPanelPositionData(marker, preferredPosition) {
-		console.log("Getting baloon panel position data...");
+		console.log("CardsConnectionPlugin._getBalloonPanelPositionData()...");
 
 		const editor = this.editor;
 		const editing = editor.editing;
@@ -546,6 +555,9 @@ export default class CardsConnectionPlugin extends Plugin {
 	}
 
 	_handleGetFilteredCardsResponse(data) {
+		console.log(
+			"CardsConnectionPlugin._handleGetFilteredCardsResponse()..."
+		);
 		const { filteredCards, cardTitle } = data;
 
 		if (!isStillCompleting(this.editor)) return;
@@ -564,6 +576,10 @@ export default class CardsConnectionPlugin extends Plugin {
 		} else {
 			this._hideUIAndRemoveMarker();
 		}
+
+		console.log(
+			"CardsConnectionPlugin._handleGetFilteredCardsResponse() ended."
+		);
 	}
 
 	destroy() {
@@ -573,7 +589,7 @@ export default class CardsConnectionPlugin extends Plugin {
 }
 
 function getBalloonPanelPositions(preferredPosition) {
-	console.log("Getting baloon panel positions...");
+	console.log("getBalloonPanelPositions()...");
 
 	const positions = {
 		// Positions the panel to the southeast of the caret rectangle.
@@ -618,7 +634,7 @@ function getBalloonPanelPositions(preferredPosition) {
 		return [positions[preferredPosition]];
 	}
 
-	console.log("Got baloon panel positions.");
+	console.log("getBalloonPanelPositions() ended.");
 
 	// By default return all position callbacks.
 	return [
@@ -632,7 +648,10 @@ function getBalloonPanelPositions(preferredPosition) {
 function getFilterCardsCallback(cardList) {
 	return (filterText) => {
 		const filteredCards = cardList.filter(({ title }) => {
-			return title.toLowerCase().includes(filterText.toLowerCase());
+			return (
+				title.toLowerCase().includes(filterText.toLowerCase()) ||
+				title === undefined
+			);
 		});
 		// Do not return more than 10 items.
 		// .slice(0, 10);
