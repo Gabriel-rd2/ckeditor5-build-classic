@@ -512,7 +512,7 @@ export default class CardsConnectionPlugin extends Plugin {
 // }
 
 export function createCardTitleRegExp() {
-	const openAfterCharacters = "\\(\\{\"'";
+	const openAfterCharacters = " \\(\\{\"'.,";
 
 	const marker = "\\[\\[";
 
@@ -525,7 +525,7 @@ export function createCardTitleRegExp() {
 	//
 	// A expressão faz o match até o cursor (end of string switch - $).
 	//               (0:      começo               )(1: marcador)(2:   título    )$
-	const pattern = `(?:^|[ ${openAfterCharacters}])(${marker})(${cardTitle})$`;
+	const pattern = `(?:^|[${openAfterCharacters}])(${marker})(${cardTitle})$`;
 
 	return new RegExp(pattern);
 }
