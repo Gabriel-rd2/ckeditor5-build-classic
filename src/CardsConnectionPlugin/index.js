@@ -516,7 +516,7 @@ export function createCardTitleRegExp() {
 
 	const marker = "\\[\\[";
 
-	const cardTitle = "\\.";
+	const cardTitle = ".*";
 
 	// O padrão consiste em 3 grupos:
 	// - 0: começo - Início da linha, espaço ou caractere de pontuação como "(" or "\", a não ser "["",
@@ -525,7 +525,7 @@ export function createCardTitleRegExp() {
 	//
 	// A expressão faz o match até o cursor (end of string switch - $).
 	//               (0:      começo               )(1: marcador)(2:   título    )$
-	const pattern = `(?:^|[ ${openAfterCharacters}])(${marker})([${cardTitle}]*)$`;
+	const pattern = `(?:^|[ ${openAfterCharacters}])(${marker})(${cardTitle})$`;
 
 	return new RegExp(pattern);
 }
