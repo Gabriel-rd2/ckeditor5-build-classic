@@ -230,6 +230,7 @@ export default class CardsConnectionUI extends Plugin {
 		const editor = this.editor;
 		const config = editor.config;
 
+		console.log("data", data);
 		const { cardList } = data;
 
 		if (!isStillCompleting(editor)) return;
