@@ -66,15 +66,11 @@ export default class CardsConnectionUI extends Plugin {
 		this._getCardList = (editor, cardTitle) => {
 			console.log("CardsConnectionUI._getCardList()...");
 
-			console.log(editor.config);
+			const cardconnectionsConfig = editor.config.get("cardconnections");
 
-			let cardList = editor.config.get("cardconnections.cardList");
-			if (cardList === undefined) {
-				const getFilteredCards = editor.config.get(
-					"cardconnections.getFilteredCards"
-				);
-
-				getFilteredCards(cardTitle)
+			if (cardconnectionsConfig.cardList === undefined) {
+				cardconnectionsConfig
+					.getFilteredCards(cardTitle)
 					.then((response) => {
 						this.fire("getCardList:response", {
 							cardList: response,
@@ -86,7 +82,7 @@ export default class CardsConnectionUI extends Plugin {
 			}
 
 			this.fire("getCardList:response", {
-				cardList,
+				cardList: cardconnectionsConfig.cardList,
 			});
 
 			console.log("CardsConnectionUI._getCardList() ended.");
