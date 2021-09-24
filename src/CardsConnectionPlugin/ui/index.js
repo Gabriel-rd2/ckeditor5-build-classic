@@ -81,12 +81,13 @@ export default class CardsConnectionUI extends Plugin {
 			}
 
 			this.fire("getCardList:response", {
-				cardList: this.cardconnectionsConfig.cardList,
+				cardList: this._cardconnectionsConfig.cardList,
 			});
 
 			console.log("CardsConnectionUI._getCardList() ended.");
 			return;
 		};
+		this.getCardList = this._getCardList.bind(this);
 
 		this.on("getCardList:response", (evt, data) =>
 			this._handleGetCardListResponse(data)
@@ -204,7 +205,7 @@ export default class CardsConnectionUI extends Plugin {
 				});
 			}
 
-			this._getCardList(cardTitle);
+			this.getCardList(cardTitle);
 		});
 
 		watcher.on("unmatched", () => {
