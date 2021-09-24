@@ -6,12 +6,6 @@ import "./theme.css";
 export default class CardsConnectionView extends ListView {
 	constructor(locale) {
 		super(locale);
-	}
-}
-
-export class CardsConnectionItemView extends ListItemView {
-	constructor(locale) {
-		super(locale);
 
 		this.extendTemplate({
 			attributes: {
@@ -21,6 +15,8 @@ export class CardsConnectionItemView extends ListItemView {
 		});
 	}
 }
+
+export class CardsConnectionItemView extends ListItemView {}
 
 export class DomWrapperView extends View {
 	constructor(locale, domElement) {
