@@ -4,6 +4,7 @@ import Collection from "@ckeditor/ckeditor5-utils/src/collection";
 import ContextualBalloon from "@ckeditor/ckeditor5-ui/src/panel/balloon/contextualballoon";
 import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import Rect from "@ckeditor/ckeditor5-utils/src/dom/rect";
+import clickOutsideHandler from "@ckeditor/ckeditor5-ui/src/bindings/clickoutsidehandler";
 
 import CardConnectionView, {
 	CardsConnectionItemView,
@@ -32,6 +33,14 @@ export default class CardsConnectionUI extends Plugin {
 		const editor = this.editor;
 
 		this._balloon = editor.plugins.get(ContextualBalloon);
+
+		// Close the dropdown upon clicking outside of the plugin UI.
+		clickOutsideHandler({
+			emitter: this._cardConnectionView,
+			activator: () => this._isUIVisible,
+			contextElements: [this._balloon.view.element],
+			callback: () => this._hideUIAndRemoveMarkers(),
+		});
 
 		// Adiciona um TextWatcher para encontrar o padrão [[*]] no texto e disparar o comando adicionado acima
 		this._setupTextWatcherForReplacingTitle();
@@ -128,23 +137,44 @@ export default class CardsConnectionUI extends Plugin {
 
 			console.log("data.text: ", data.text);
 			console.log("cardTitle: ", cardTitle);
-			// Create a marker range.
+
 			const start = focus.getShiftedBy(-matchedTextLength);
-			const end = focus.getShiftedBy(-cardTitle.length);
-			const markerRange = editor.model.createRange(start, end);
+			const bracketsEnd = focus.getShiftedBy(-cardTitle.length);
+			// Cria uma range para o marcador do padrão [[.
+			const bracketsMarkerRange = editor.model.createRange(
+				start,
+				bracketsEnd
+			);
+			// Cria uma range para o padrão [[ e o pedaço do título escrito.
+			const matchedTextMarkerRange = editor.model.createRange(
+				start,
+				focus
+			);
 
 			if (isStillCompleting(editor)) {
-				const cardConnectionMarker =
-					editor.model.markers.get("cardconnection");
+				const cardConnectionMarker = editor.model.markers.get(
+					"cardconnection:marker"
+				);
+				const matchedTextMarker = editor.model.markers.get(
+					"cardconnection:text"
+				);
 				editor.model.change((writer) => {
 					writer.updateMarker(cardConnectionMarker, {
-						range: markerRange,
+						range: bracketsMarkerRange,
+					});
+					writer.updateMarker(matchedTextMarker, {
+						range: matchedTextMarkerRange,
 					});
 				});
 			} else {
 				editor.model.change((writer) => {
-					writer.addMarker("cardconnection", {
-						range: markerRange,
+					writer.addMarker("cardconnection:marker", {
+						range: bracketsMarkerRange,
+						usingOperation: false,
+						affectsData: false,
+					});
+					writer.addMarker("cardconnection:text", {
+						range: matchedTextMarkerRange,
 						usingOperation: false,
 						affectsData: false,
 					});
@@ -156,11 +186,8 @@ export default class CardsConnectionUI extends Plugin {
 
 		watcher.on("unmatched", () => {
 			console.log("marking model watcher unmatched!");
-			this._hideUIAndRemoveMarker();
+			this._hideUIAndRemoveMarkers();
 		});
-
-		// const cardConnectionCommand = editor.commands.get("cardconnection");
-		// watcher.bind("isEnabled").to(cardConnectionCommand);
 
 		console.log(
 			"CardsConnectionPlugin._setupTextWatcherForMarkingModel() ended."
@@ -183,13 +210,14 @@ export default class CardsConnectionUI extends Plugin {
 			this._items.add({ id: card.id.toString(), title: card.title });
 		}
 
-		const cardConnectionMarker =
-			this.editor.model.markers.get("cardconnection");
+		const cardConnectionMarker = this.editor.model.markers.get(
+			"cardconnection:marker"
+		);
 
 		if (this._items.length > 0) {
 			this._showOrUpdateUI(cardConnectionMarker);
 		} else {
-			this._hideUIAndRemoveMarker();
+			this._hideUIAndRemoveMarkers();
 		}
 
 		console.log(
@@ -225,15 +253,16 @@ export default class CardsConnectionUI extends Plugin {
 		}
 	}
 
-	_hideUIAndRemoveMarker() {
+	_hideUIAndRemoveMarkers() {
 		if (this._balloon.hasView(this._cardConnectionView)) {
 			this._balloon.remove(this._cardConnectionView);
 		}
 
 		if (isStillCompleting(this.editor)) {
-			this.editor.model.change((writer) =>
-				writer.removeMarker("cardconnection")
-			);
+			this.editor.model.change((writer) => {
+				writer.removeMarker("cardconnection:marker");
+				writer.removeMarker("cardconnection:text");
+			});
 		}
 
 		this._cardConnectionView.position = undefined;
@@ -250,11 +279,16 @@ export default class CardsConnectionUI extends Plugin {
 
 		buttonView.on("execute", (eventInfo) => {
 			const { label } = eventInfo.source;
+			const matchedTextMarker = editor.model.markers.get(
+				"cardconnection:text"
+			);
+
 			editor.model.change((writer) => {
-				const text = writer.createText(`${label}]]`);
-				editor.model.insertContent(text, selection.focus);
-				// this._hideUIAndRemoveMarker();
+				writer.remove(matchedTextMarker.range);
+				const text = writer.createText(`[[${label}]]`);
+				editor.model.insertContent(text, matchedTextMarker.start);
 				writer.setSelection(writer.createPositionAfter(text));
+				// this._hideUIAndRemoveMarkers();
 			});
 		});
 
@@ -324,9 +358,6 @@ function getBalloonPanelPositions(preferredPosition) {
 				top: targetRect.bottom + VERTICAL_SPACING,
 				left: targetRect.right,
 				name: "caret_se",
-				// config: {
-				// 	withArrow: false,
-				// },
 			};
 		},
 
@@ -336,9 +367,6 @@ function getBalloonPanelPositions(preferredPosition) {
 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
 				left: targetRect.right,
 				name: "caret_ne",
-				// config: {
-				// 	withArrow: false,
-				// },
 			};
 		},
 
@@ -348,9 +376,6 @@ function getBalloonPanelPositions(preferredPosition) {
 				top: targetRect.bottom + VERTICAL_SPACING,
 				left: targetRect.right - balloonRect.width,
 				name: "caret_sw",
-				// config: {
-				// 	withArrow: false,
-				// },
 			};
 		},
 
@@ -360,9 +385,6 @@ function getBalloonPanelPositions(preferredPosition) {
 				top: targetRect.top - balloonRect.height - VERTICAL_SPACING,
 				left: targetRect.right - balloonRect.width,
 				name: "caret_nw",
-				// config: {
-				// 	withArrow: false,
-				// },
 			};
 		},
 	};
@@ -430,5 +452,5 @@ function getFilterCardsCallback(cardList) {
 }
 
 function isStillCompleting(editor) {
-	return editor.model.markers.has("cardconnection");
+	return editor.model.markers.has("cardconnection:marker");
 }

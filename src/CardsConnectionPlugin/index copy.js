@@ -356,9 +356,9 @@ export default class CardsConnectionPlugin extends Plugin {
 		buttonView.on("execute", (eventInfo) => {
 			const { label } = eventInfo.source;
 			editor.model.change((writer) => {
-				const text = writer.createText(`${label}]]`);
+				const text = writer.createText(`[[${label}]]`);
 				editor.model.insertContent(text, selection.focus);
-				this._hideUIAndRemoveMarker();
+				this._hideUI();
 				writer.setSelection(writer.createPositionAfter(text));
 			});
 		});
