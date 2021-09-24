@@ -31,7 +31,7 @@ export default class CardsConnectionUI extends Plugin {
 
 		config.define("cardconnections", {
 			cardList: undefined,
-			getFilterCards: undefined,
+			getFilteredCards: undefined,
 		});
 
 		this._balloon = editor.plugins.get(ContextualBalloon);
@@ -65,6 +65,8 @@ export default class CardsConnectionUI extends Plugin {
 
 		this._getCardList = (editor, cardTitle) => {
 			console.log("CardsConnectionUI._getCardList()...");
+
+			console.log(editor.config);
 
 			let cardList = editor.config.get("cardconnections.cardList");
 			if (cardList === undefined) {
