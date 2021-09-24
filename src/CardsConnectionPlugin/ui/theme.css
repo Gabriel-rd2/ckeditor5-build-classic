@@ -1,0 +1,14 @@
+:root {
+	--ck-cardconnection-list-max-height: 300px;
+}
+
+.ck.ck-cardconnection-list {
+	max-height: var(--ck-cardconnection-list-max-height);
+	overflow-y: auto;
+	overflow-x: hidden;
+	overscroll-behavior: contain;
+	& > .ck-list__item {
+		overflow: hidden;
+		flex-shrink: 0;
+	}
+}
