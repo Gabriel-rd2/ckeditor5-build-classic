@@ -90,6 +90,7 @@ export default class CardsConnectionUI extends Plugin {
 			console.log("CardsConnectionUI._getCardList() ended.");
 			return;
 		};
+		this._getCardList.bind(this);
 
 		this.on("getCardList:response", (evt, data) =>
 			this._handleGetCardListResponse(data)
