@@ -33,6 +33,7 @@ export default class CardsConnectionUI extends Plugin {
 			cardList: undefined,
 			getFilteredCards: undefined,
 		});
+		this._cardconnectionsConfig = this.editor.config.get("cardconnections");
 
 		this._balloon = editor.plugins.get(ContextualBalloon);
 
@@ -51,8 +52,8 @@ export default class CardsConnectionUI extends Plugin {
 		this._setupTextWatcherForMarkingModel();
 
 		if (
-			config.get("cardconnections.cardList") === undefined &&
-			config.get("cardconnections.getFilteredCards") === undefined
+			this._cardconnectionsConfig.cardList === undefined &&
+			this._cardconnectionsConfig.getFilteredCards === undefined
 		) {
 			throw new CKEditorError(
 				"cardsconnectionconfig-no-card-list-source",
@@ -63,13 +64,11 @@ export default class CardsConnectionUI extends Plugin {
 			);
 		}
 
-		this._getCardList = (editor, cardTitle) => {
+		this._getCardList = (cardTitle) => {
 			console.log("CardsConnectionUI._getCardList()...");
 
-			const cardconnectionsConfig = editor.config.get("cardconnections");
-
-			if (cardconnectionsConfig.cardList === undefined) {
-				cardconnectionsConfig
+			if (this._cardconnectionsConfig.cardList === undefined) {
+				this._cardconnectionsConfig
 					.getFilteredCards(cardTitle)
 					.then((response) => {
 						this.fire("getCardList:response", {
@@ -82,7 +81,7 @@ export default class CardsConnectionUI extends Plugin {
 			}
 
 			this.fire("getCardList:response", {
-				cardList: cardconnectionsConfig.cardList,
+				cardList: this.cardconnectionsConfig.cardList,
 			});
 
 			console.log("CardsConnectionUI._getCardList() ended.");
@@ -205,7 +204,7 @@ export default class CardsConnectionUI extends Plugin {
 				});
 			}
 
-			this._getCardList(editor, cardTitle);
+			this._getCardList(cardTitle);
 		});
 
 		watcher.on("unmatched", () => {
@@ -231,7 +230,7 @@ export default class CardsConnectionUI extends Plugin {
 
 		this._items.clear();
 
-		for (const card of filteredCards) {
+		for (const card of cardList) {
 			this._items.add({ id: card.id.toString(), title: card.title });
 		}
 
