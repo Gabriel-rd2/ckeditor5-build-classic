@@ -88,11 +88,11 @@ export default class CardsConnectionUI extends Plugin {
 				} catch (error) {
 					this.fire("requestFeed:error", { error });
 				}
+			} else {
+				this.fire("getCardList:response", {
+					cardList: this._cardconnectionsConfig.cardList,
+				});
 			}
-
-			this.fire("getCardList:response", {
-				cardList: this._cardconnectionsConfig.cardList,
-			});
 
 			console.log("CardsConnectionUI._getCardList() ended.");
 			return;
