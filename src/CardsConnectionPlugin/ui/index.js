@@ -66,6 +66,12 @@ export default class CardsConnectionUI extends Plugin {
 
 		this._getCardList = (cardTitle) => {
 			console.log("CardsConnectionUI._getCardList()...");
+			console.log("cardTitle", cardTitle);
+
+			if (cardTitle === "")
+				this.fire("getCardList:response", {
+					cardList: [],
+				});
 
 			if (this._cardconnectionsConfig.cardList === undefined) {
 				this._cardconnectionsConfig
@@ -87,7 +93,6 @@ export default class CardsConnectionUI extends Plugin {
 			console.log("CardsConnectionUI._getCardList() ended.");
 			return;
 		};
-		this.getCardList = this._getCardList.bind(this);
 
 		this.on("getCardList:response", (evt, data) =>
 			this._handleGetCardListResponse(data)
@@ -205,7 +210,7 @@ export default class CardsConnectionUI extends Plugin {
 				});
 			}
 
-			this.getCardList(cardTitle);
+			this._getCardList(cardTitle);
 		});
 
 		watcher.on("unmatched", () => {
