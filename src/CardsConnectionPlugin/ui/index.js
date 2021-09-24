@@ -284,9 +284,9 @@ export default class CardsConnectionUI extends Plugin {
 			);
 
 			editor.model.change((writer) => {
-				writer.remove(matchedTextMarker.range);
+				writer.remove(matchedTextMarker.getRange());
 				const text = writer.createText(`[[${label}]]`);
-				editor.model.insertContent(text, matchedTextMarker.start);
+				editor.model.insertContent(text, matchedTextMarker.getStart());
 				writer.setSelection(writer.createPositionAfter(text));
 				// this._hideUIAndRemoveMarkers();
 			});
