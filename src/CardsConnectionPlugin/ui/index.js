@@ -79,6 +79,7 @@ export default class CardsConnectionUI extends Plugin {
 				this._cardconnectionsConfig
 					.getFilteredCards(cardTitle)
 					.then((response) => {
+						console.log("Asynchronous _getCardList:", response);
 						this.fire("getCardList:response", {
 							cardList: response,
 						});
