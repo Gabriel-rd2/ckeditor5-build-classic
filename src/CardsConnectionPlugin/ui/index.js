@@ -72,11 +72,10 @@ export default class CardsConnectionUI extends Plugin {
 					"cardconnections.getFilteredCards"
 				);
 
-				getFilteredCards
+				getFilteredCards(cardTitle)
 					.then((response) => {
 						this.fire("getCardList:response", {
 							cardList: response,
-							cardTitle,
 						});
 					})
 					.catch((error) => {
@@ -86,7 +85,6 @@ export default class CardsConnectionUI extends Plugin {
 
 			this.fire("getCardList:response", {
 				cardList,
-				cardTitle,
 			});
 
 			console.log("CardsConnectionUI._getCardList() ended.");
