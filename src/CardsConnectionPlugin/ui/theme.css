@@ -21,6 +21,6 @@
 	white-space: normal !important;
 }
 
-.ck.ck-cardconnection-button span {
+.ck.ck-cardconnection-button > span {
 	white-space: normal !important;
 }
