@@ -19,7 +19,7 @@
 
 .ck.ck-cardconnection-button {
 	white-space: normal !important;
-	$ > span {
+	span {
 		white-space: normal !important;
 	}
 }
