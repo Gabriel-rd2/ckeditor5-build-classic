@@ -63,12 +63,12 @@ export default class CardsConnectionUI extends Plugin {
 			);
 		}
 
-		this._getCardList = (cardTitle) => {
+		this._getCardList = (editor, cardTitle) => {
 			console.log("CardsConnectionUI._getCardList()...");
 
-			let cardList = this.editor.config.get("cardconnections.cardList");
+			let cardList = editor.config.get("cardconnections.cardList");
 			if (cardList === undefined) {
-				const getFilteredCards = this.editor.config.get(
+				const getFilteredCards = editor.config.get(
 					"cardconnections.getFilteredCards"
 				);
 
@@ -90,7 +90,6 @@ export default class CardsConnectionUI extends Plugin {
 			console.log("CardsConnectionUI._getCardList() ended.");
 			return;
 		};
-		this._getCardList.bind(this);
 
 		this.on("getCardList:response", (evt, data) =>
 			this._handleGetCardListResponse(data)
@@ -208,7 +207,7 @@ export default class CardsConnectionUI extends Plugin {
 				});
 			}
 
-			this._getCardList(cardTitle);
+			this._getCardList(editor, cardTitle);
 		});
 
 		watcher.on("unmatched", () => {
