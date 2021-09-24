@@ -16,7 +16,17 @@ export default class CardsConnectionView extends ListView {
 	}
 }
 
-export class CardsConnectionItemView extends ListItemView {}
+export class CardsConnectionItemView extends ListItemView {
+	constructor(locale) {
+		super(locale);
+
+		this.extendTemplate({
+			attributes: {
+				class: ["ck-cardconnection-list-item"],
+			},
+		});
+	}
+}
 
 export class DomWrapperView extends View {
 	constructor(locale, domElement) {

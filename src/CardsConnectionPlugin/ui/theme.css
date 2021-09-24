@@ -4,6 +4,7 @@
 
 .ck.ck-cardconnection-list {
 	max-height: var(--ck-cardconnection-list-max-height);
+	width: 200px;
 	overflow-y: auto;
 	overflow-x: hidden;
 	overscroll-behavior: contain;
@@ -11,4 +12,9 @@
 		overflow: hidden;
 		flex-shrink: 0;
 	}
+}
+
+.ck.ck-cardconnection-list-item {
+	text-overflow: hidden;
+	word-wrap: break;
 }
