@@ -27,8 +27,8 @@ export default class CardsConnectionUI extends Plugin {
 	init() {
 		console.log("CardsConnectionUI.init()...");
 		const editor = this.editor;
-
 		const config = editor.config;
+
 		config.define("cardconnections", {
 			cardList: undefined,
 			getFilterCards: undefined,
@@ -66,9 +66,9 @@ export default class CardsConnectionUI extends Plugin {
 		this._getCardList = (cardTitle) => {
 			console.log("CardsConnectionUI._getCardList()...");
 
-			let cardList = config.get("cardconnections.cardList");
+			let cardList = this.editor.config.get("cardconnections.cardList");
 			if (cardList === undefined) {
-				const getFilteredCards = config.get(
+				const getFilteredCards = this.editor.config.get(
 					"cardconnections.getFilteredCards"
 				);
 
