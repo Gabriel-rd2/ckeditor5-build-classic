@@ -14,9 +14,9 @@
 	text-overflow: ellipsis;
 	word-wrap: break-word;
 	display: inline-block;
-	white-space: normal;
+	white-space: normal !important;
 }
 
 .ck.ck-cardconnection-button {
-	white-space: inherit;
+	white-space: normal !important;
 }
