@@ -1,9 +1,5 @@
-:root {
-	--ck-cardconnection-list-max-height: 300px;
-}
-
 .ck.ck-cardconnection-list {
-	max-height: var(--ck-cardconnection-list-max-height);
+	max-height: 300px;
 	width: 200px;
 	overflow-y: auto;
 	overflow-x: hidden;
@@ -18,8 +14,9 @@
 	text-overflow: ellipsis;
 	word-wrap: break-word;
 	display: inline-block;
+	white-space: normal;
 }
 
 .ck.ck-cardconnection-button {
-	white-space: normal;
+	white-space: inherit;
 }
