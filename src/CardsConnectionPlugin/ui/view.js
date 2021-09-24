@@ -39,23 +39,3 @@ export class Button extends ButtonView {
 		});
 	}
 }
-
-// export class DomWrapperView extends View {
-// 	constructor(locale, domElement) {
-// 		super(locale);
-
-// 		// Disable template rendering on this view.
-// 		this.template = false;
-
-// 		this.domElement = domElement;
-
-// 		this.listenTo(this.domElement, "click", () => {
-// 			console.log(this.domElement.innerHTML);
-// 		});
-// 	}
-
-// 	render() {
-// 		super.render();
-// 		this.element = this.domElement;
-// 	}
-// }

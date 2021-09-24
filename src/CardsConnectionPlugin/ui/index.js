@@ -28,6 +28,12 @@ export default class CardsConnectionUI extends Plugin {
 		console.log("CardsConnectionUI.init()...");
 		const editor = this.editor;
 
+		const config = editor.config;
+		config.define("cardconnections", {
+			cardList: undefined,
+			getFilterCards: undefined,
+		});
+
 		this._balloon = editor.plugins.get(ContextualBalloon);
 
 		// Close the dropdown upon clicking outside of the plugin UI.
@@ -44,9 +50,53 @@ export default class CardsConnectionUI extends Plugin {
 		// const filterCardsCallback = (
 		this._setupTextWatcherForMarkingModel();
 
-		this.on("getFilteredCards:response", (evt, data) =>
-			this._handleGetFilteredCardsResponse(data)
+		if (
+			config.get("cardconnections.cardList") === undefined &&
+			config.get("cardconnections.getFilteredCards") === undefined
+		) {
+			throw new CKEditorError(
+				"cardsconnectionconfig-no-card-list-source",
+				null,
+				{
+					config,
+				}
+			);
+		}
+
+		this._getCardList = (cardTitle) => {
+			console.log("CardsConnectionUI._getCardList()...");
+
+			let cardList = config.get("cardconnections.cardList");
+			if (cardList === undefined) {
+				const getFilteredCards = config.get(
+					"cardconnections.getFilteredCards"
+				);
+
+				getFilteredCards
+					.then((response) => {
+						this.fire("getCardList:response", {
+							cardList: response,
+							cardTitle,
+						});
+					})
+					.catch((error) => {
+						this.fire("requestFeed:error", { error });
+					});
+			}
+
+			this.fire("getCardList:response", {
+				cardList,
+				cardTitle,
+			});
+
+			console.log("CardsConnectionUI._getCardList() ended.");
+			return;
+		};
+
+		this.on("getCardList:response", (evt, data) =>
+			this._handleGetCardListResponse(data)
 		);
+		this.on("getCardList:error", () => this._hideUIAndRemoveMarker());
 
 		console.log("CardsConnectionUI.init() ended.");
 	}
@@ -63,7 +113,7 @@ export default class CardsConnectionUI extends Plugin {
 	_createCardConnectionView() {
 		console.log("CardsConnectionPlugin._createCardConnectionView()...");
 		const editor = this.editor;
-		const locale = this.editor.locale;
+		const locale = editor.locale;
 
 		const cardConnectionView = new CardConnectionView(locale);
 
@@ -84,24 +134,6 @@ export default class CardsConnectionUI extends Plugin {
 		console.log("CardsConnectionPlugin._createCardConnectionView() ended.");
 
 		return cardConnectionView;
-	}
-
-	_getFilteredCards(cardTitle) {
-		console.log("_getFilteredCards()...");
-		this._lastTitleSearched = cardTitle;
-		const cardList = this.editor.config.get("cardconnections.cardList");
-		const filterCards = getFilterCardsCallback(cardList);
-
-		console.log("cardTitle: ", cardTitle);
-		const filteredCards = filterCards(cardTitle);
-
-		this.fire("getFilteredCards:response", {
-			filteredCards,
-			cardTitle,
-		});
-
-		console.log("_getFilteredCards() ended.");
-		return;
 	}
 
 	_setupTextWatcherForReplacingTitle() {
@@ -177,7 +209,7 @@ export default class CardsConnectionUI extends Plugin {
 				});
 			}
 
-			this._getFilteredCards(cardTitle);
+			this._getCardList(cardTitle);
 		});
 
 		watcher.on("unmatched", () => {
@@ -190,15 +222,16 @@ export default class CardsConnectionUI extends Plugin {
 		);
 	}
 
-	_handleGetFilteredCardsResponse(data) {
-		console.log(
-			"CardsConnectionPlugin._handleGetFilteredCardsResponse()..."
-		);
-		const { filteredCards, cardTitle } = data;
+	_handleGetCardListResponse(data) {
+		console.log("CardsConnectionPlugin._handleGetCardListResponse()...");
+		const editor = this.editor;
+		const config = editor.config;
 
-		console.log("filteredCards: ", filteredCards);
-		console.log("cardTitle: ", cardTitle);
-		if (!isStillCompleting(this.editor)) return;
+		const { cardList } = data;
+
+		if (!isStillCompleting(editor)) return;
+
+		config.set("cardconnections.cardList", cardList);
 
 		this._items.clear();
 
@@ -206,7 +239,7 @@ export default class CardsConnectionUI extends Plugin {
 			this._items.add({ id: card.id.toString(), title: card.title });
 		}
 
-		const cardConnectionMarker = this.editor.model.markers.get(
+		const cardConnectionMarker = editor.model.markers.get(
 			"cardconnection:marker"
 		);
 
@@ -217,7 +250,7 @@ export default class CardsConnectionUI extends Plugin {
 		}
 
 		console.log(
-			"CardsConnectionPlugin._handleGetFilteredCardsResponse() ended."
+			"CardsConnectionPlugin._handleGetCardListResponse() ended."
 		);
 	}
 
@@ -435,20 +468,6 @@ function getCardTitleText(text) {
 	const regExp = createCardTitleRegExp();
 	const match = text.match(regExp);
 	return match[2];
-}
-
-function getFilterCardsCallback(cardList) {
-	console.log("getFilterCardsCallback()...");
-	return (filterText) => {
-		const filteredCards = cardList.filter(
-			({ title }) =>
-				title.toLowerCase().includes(filterText.toLowerCase()) &&
-				!!filterText
-		);
-		// Do not return more than 10 items.
-		// .slice(0, 10);
-		return filteredCards;
-	};
 }
 
 function isStillCompleting(editor) {
