@@ -64,9 +64,8 @@ export default class CardsConnectionUI extends Plugin {
 			);
 		}
 
-		this._getCardList = (cardTitle) => {
+		this._getCardList = async (cardTitle) => {
 			console.log("CardsConnectionUI._getCardList()...");
-			console.log("cardTitle", cardTitle);
 
 			if (cardTitle === "") {
 				this.fire("getCardList:response", {
@@ -76,17 +75,19 @@ export default class CardsConnectionUI extends Plugin {
 			}
 
 			if (this._cardconnectionsConfig.cardList === undefined) {
-				this._cardconnectionsConfig
-					.getFilteredCards(cardTitle)
-					.then((response) => {
-						console.log("Asynchronous _getCardList:", response);
-						this.fire("getCardList:response", {
-							cardList: response,
-						});
-					})
-					.catch((error) => {
-						this.fire("requestFeed:error", { error });
+				console.log("cardTitle", cardTitle);
+				try {
+					const response =
+						await this._cardconnectionsConfig.getFilteredCards(
+							cardTitle
+						);
+					console.log("Asynchronous _getCardList:", response);
+					this.fire("getCardList:response", {
+						cardList: response,
 					});
+				} catch (error) {
+					this.fire("requestFeed:error", { error });
+				}
 			}
 
 			this.fire("getCardList:response", {
