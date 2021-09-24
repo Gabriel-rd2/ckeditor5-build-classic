@@ -23,4 +23,6 @@
 
 .ck.ck-cardconnection-button > span {
 	white-space: normal !important;
+	text-align: justify;
+	text-justify: inter-word;
 }
