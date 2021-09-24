@@ -68,7 +68,12 @@ export default class CardsConnectionUI extends Plugin {
 			console.log("CardsConnectionUI._getCardList()...");
 			console.log("cardTitle", cardTitle);
 
-			if (cardTitle === "") return;
+			if (cardTitle === "") {
+				this.fire("getCardList:response", {
+					cardList: [],
+				});
+				return;
+			}
 
 			if (this._cardconnectionsConfig.cardList === undefined) {
 				this._cardconnectionsConfig
