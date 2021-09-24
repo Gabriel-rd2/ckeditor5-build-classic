@@ -288,8 +288,9 @@ export default class CardsConnectionUI extends Plugin {
 				writer.remove(matchedTextMarker.getRange());
 				const text = writer.createText(`[[${label}]]`);
 				editor.model.insertContent(text, selection.focus);
-				writer.setSelection(writer.createPositionAfter(text));
-				// this._hideUIAndRemoveMarkers();
+				writer.setSelection(
+					writer.createPositionAt(selection.focus, "end")
+				);
 			});
 
 			editor.editing.view.focus();
