@@ -15,6 +15,11 @@
 }
 
 .ck.ck-cardconnection-list-item {
-	text-overflow: hidden;
-	word-wrap: break;
+	text-overflow: ellipsis;
+	word-wrap: break-word;
+	display: inline-block;
+}
+
+.ck.ck-cardconnection-button {
+	white-space: normal;
 }

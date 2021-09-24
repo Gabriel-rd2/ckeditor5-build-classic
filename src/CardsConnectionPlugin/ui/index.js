@@ -2,14 +2,10 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import TextWatcher from "@ckeditor/ckeditor5-typing/src/textwatcher";
 import Collection from "@ckeditor/ckeditor5-utils/src/collection";
 import ContextualBalloon from "@ckeditor/ckeditor5-ui/src/panel/balloon/contextualballoon";
-import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import Rect from "@ckeditor/ckeditor5-utils/src/dom/rect";
 import clickOutsideHandler from "@ckeditor/ckeditor5-ui/src/bindings/clickoutsidehandler";
 
-import CardConnectionView, {
-	CardsConnectionItemView,
-	DomWrapperView,
-} from "./view";
+import CardConnectionView, { CardsConnectionItemView, Button } from "./view";
 
 const VERTICAL_SPACING = 3;
 
@@ -272,7 +268,7 @@ export default class CardsConnectionUI extends Plugin {
 		const editor = this.editor;
 		const selection = editor.model.document.selection;
 
-		const buttonView = new ButtonView(editor.locale);
+		const buttonView = new Button(editor.locale);
 		buttonView.label = item.title;
 		buttonView.withText = true;
 		buttonView.isEnabled = true;
