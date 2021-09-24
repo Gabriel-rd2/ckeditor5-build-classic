@@ -290,6 +290,8 @@ export default class CardsConnectionUI extends Plugin {
 				writer.setSelection(writer.createPositionAfter(text));
 				// this._hideUIAndRemoveMarkers();
 			});
+
+			editor.editing.view.focus();
 		});
 
 		return buttonView;
