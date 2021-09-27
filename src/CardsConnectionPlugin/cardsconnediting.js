@@ -2,28 +2,26 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 
 import CardConnectionCommand from "./cardsconncommand";
 
+// Plugin de manipulação de dados, que define como as conexões serão mostradas e salvas pelo editor
 export default class CardsConnectionEditing extends Plugin {
 	static get pluginName() {
 		return "CardsConnectionEditing";
 	}
 
 	init() {
-		console.log("CardsConnectionEditing.init()...");
-
 		const editor = this.editor;
 
-		// Define novos componentes para o modelo interno do CkEditor
+		// Define o componente das conexões para o modelo interno do CkEditor
 		this._defineSchema();
-		// Define políticas para as conversões entre as views de dados, edição e o modelo
+
+		// Define políticas para as conversões entre as views de dados, da edição e do modelo
 		this._defineConverters();
 
-		// Adiciona o commando que substitui o padrão [[*]] por um link para um card de título "*"
+		// Adiciona o commando que substitui o padrão [[*]] por uma conexão para um card de título "*"
 		editor.commands.add(
 			"cardconnection",
 			new CardConnectionCommand(editor)
 		);
-
-		console.log("CardsConnectionEditing.init() ended.");
 	}
 
 	_defineSchema() {
@@ -61,12 +59,13 @@ export default class CardsConnectionEditing extends Plugin {
 				return;
 			}
 
+			// Procura o card cujo id está noa tributo do link na lista de cards da configuração do editor
 			const cardid = parseInt(viewAnchor.getAttribute("cardid"));
 			const card = config
 				.get("cardconnections.cardList")
 				.find(({ id }) => id === cardid);
 
-			// Caso contrário se o card não for encontrado só significa que é um card que não existe ainda, mas temos que adicioná-lo ao modelo de qualquer maneira
+			// Copiamos os atributos title e link do card da lista se ele for achado, se não pegamos os atributos do link
 			const cardtitle =
 				card !== undefined
 					? card.title
@@ -77,9 +76,8 @@ export default class CardsConnectionEditing extends Plugin {
 					: viewAnchor.getAttribute("href");
 
 			let modelElement;
-
-			// Caso o card não for encontrado e cardid !== -1, a conexão é para um card que foi removido, então adicionamos uma conexão com atributo "carddeleted" ao modelo
 			if (card === undefined && cardid !== -1) {
+				// Caso o card não for encontrado e cardid !== -1, a conexão é para um card que foi removido, então adicionamos uma conexão apenas com atributo "carddeleted" ao modelo
 				modelElement = conversionApi.writer.createElement(
 					"cardconnection",
 					{
@@ -87,6 +85,7 @@ export default class CardsConnectionEditing extends Plugin {
 					}
 				);
 			} else {
+				// Caso contrário adicionamos a conexão normalmente
 				modelElement = conversionApi.writer.createElement(
 					"cardconnection",
 					{
@@ -97,12 +96,13 @@ export default class CardsConnectionEditing extends Plugin {
 				);
 			}
 
-			// Tentamos adicionar o elemento ao modelo, na posição do cursor do modelo, no caso de erro retornamos
+			// Tentamos adicionar o elemento ao modelo, na posição do cursor do modelo, no caso de erro retornamos e não adiciona-se nada
 			if (!conversionApi.safeInsert(modelElement, data.modelCursor))
 				return;
 
-			// Marcamos que já tratamos o elemento a que estamos vendo atualmente e atualizamos o resultado da conversão
+			// Marcamos que já tratamos o elemento <a> que estamos explorando atualmente
 			conversionApi.consumable.consume(viewAnchor, { name: true });
+			// Atualizamos o resultado da conversão
 			conversionApi.updateConversionResult(modelElement, data);
 		}
 
@@ -141,18 +141,20 @@ export default class CardsConnectionEditing extends Plugin {
 		function createViewElement(data, conversionApi, pipeline) {
 			const modelItem = data.item;
 
+			// Pega os atributos da conexão no modelo do ckeditor
 			const carddeleted = modelItem.getAttribute("carddeleted");
 			const cardid = parseInt(modelItem.getAttribute("cardid"));
 			const cardtitle = modelItem.getAttribute("cardtitle");
 			const cardlink = modelItem.getAttribute("cardlink");
 
+			// Procura o card mencionado na lista de cards da configuração
 			const card = config
 				.get("cardconnections.cardList")
 				.find((card) => card.id === cardid);
 
 			let viewElement;
-
 			if (carddeleted === undefined) {
+				// Se o componenete do modelo não possuir o atributo carddeleted, é adicionado um link normal
 				viewElement = conversionApi.writer.createRawElement(
 					"a",
 					{
@@ -180,6 +182,7 @@ export default class CardsConnectionEditing extends Plugin {
 					}
 				);
 			} else {
+				// Caso for um link para um card deletado, é adicionado um link vazio com a mensagem de card deletado definida na configuração
 				viewElement = conversionApi.writer.createRawElement(
 					"a",
 					{
@@ -188,9 +191,9 @@ export default class CardsConnectionEditing extends Plugin {
 						href: "javascript:void(0)",
 					},
 					function (domElement) {
-						const innerText = config.get(
-							"cardconnections.cardDeletedMessage"
-						);
+						const innerText =
+							config.get("cardconnections.cardDeletedMessage") ||
+							"card deleted";
 
 						domElement.innerHTML =
 							pipeline === "editing"
@@ -205,6 +208,7 @@ export default class CardsConnectionEditing extends Plugin {
 			return viewElement;
 		}
 
+		// Função para inserir elemento nas view de edição e dados, como definido na documentação
 		function insertViewElement(data, conversionApi, viewElement) {
 			conversionApi.consumable.consume(data.item, "insert");
 

@@ -3,6 +3,14 @@ import ListItemView from "@ckeditor/ckeditor5-ui/src/list/listitemview";
 import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 
 import "./theme.css";
+
+/**
+ * View de UI do CkEditor que contém uma lista de cards para as conexões
+ *
+ * @export
+ * @class CardsConnectionView
+ * @extends {ListView}
+ */
 export default class CardsConnectionView extends ListView {
 	constructor(locale) {
 		super(locale);
