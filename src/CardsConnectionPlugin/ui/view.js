@@ -24,6 +24,13 @@ export default class CardsConnectionView extends ListView {
 	}
 }
 
+/**
+ * View de UI do CkEditor que contém um item da lista de cards.
+ *
+ * @export
+ * @class CardsConnectionItemView
+ * @extends {ListItemView}
+ */
 export class CardsConnectionItemView extends ListItemView {
 	constructor(locale) {
 		super(locale);
@@ -36,6 +43,13 @@ export class CardsConnectionItemView extends ListItemView {
 	}
 }
 
+/**
+ * View de Botão do CkEditor
+ *
+ * @export
+ * @class Button
+ * @extends {ButtonView}
+ */
 export class Button extends ButtonView {
 	constructor(locale) {
 		super(locale);
