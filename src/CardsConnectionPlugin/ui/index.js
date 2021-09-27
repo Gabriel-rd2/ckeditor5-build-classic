@@ -382,7 +382,7 @@ export default class CardsConnectionUI extends Plugin {
 		const selection = editor.model.document.selection;
 
 		const buttonView = new Button(editor.locale);
-		buttonView.label = `<span><img src="/logos/duuca_logo.svg" width="15px" style="margin:-2px 0px 0px" alt="Duuca" /> ${card.title}</span>`;
+		buttonView.label = card.title;
 		buttonView.withText = true;
 		buttonView.isEnabled = true;
 
